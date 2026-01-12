@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #11d452;
+  --color-secondary: #D4AF37;
+  --color-background-light: #f6f8f6;
+  --color-background-dark: #102216;
+  --color-surface-dark: #162e1f;
+
+  --font-display: "Noto Serif", serif;
+  --font-body: "Noto Sans", sans-serif;
+}
+
+/* Ensure consistent background across all devices */
+html {
+  background-color: #102216;
+  min-height: 100%;
+}
+
+body {
+  background-color: #102216;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  background-color: #102216;
+  min-height: 100vh;
+}
+
+
+/* Custom scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Replicate gold gradients from HTML */
+.gold-gradient-text {
+  background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gold-border-bottom {
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(to right, transparent, #8a7035, transparent) 1;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 40px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-fade-in-up {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+  animation-name: fadeInUp;
+}
