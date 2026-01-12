@@ -36,8 +36,20 @@ const Cart = () => {
 
     const getUnitPrice = (item) => item?.finalPrice ?? item?.price ?? item?.product?.price ?? 0;
     const getImageUrl = (item) => {
-        const img = item?.product?.images?.[0];
-        if (!img) return null;
+        const product = item?.product;
+        if (!product) return null;
+        
+        // Get the variant to check for variant-specific images
+        const variant = product?.variants?.find(v => v._id?.toString?.() === item?.variantId?.toString?.());
+        
+        // Prefer variant images, fallback to product images
+        const images = (variant?.images && variant.images.length > 0) 
+            ? variant.images 
+            : (product.images && product.images.length > 0 ? product.images : []);
+        
+        if (!images || images.length === 0) return null;
+        
+        const img = images[0];
         return typeof img === 'string' ? img : img.url || null;
     };
     const subtotal = items.reduce((acc, item) => acc + (getUnitPrice(item) * item.quantity), 0);

@@ -8,6 +8,24 @@ const OrderSuccess = () => {
     const { data: orderData, isLoading } = useOrder(orderId);
     const order = orderData?.order;
 
+    const getImageUrl = (item) => {
+        const product = item?.product;
+        if (!product) return null;
+        
+        // Get the variant to check for variant-specific images
+        const variant = product?.variants?.find(v => v._id?.toString?.() === item?.variantId?.toString?.());
+        
+        // Prefer variant images, fallback to product images
+        const images = (variant?.images && variant.images.length > 0) 
+            ? variant.images 
+            : (product.images && product.images.length > 0 ? product.images : []);
+        
+        if (!images || images.length === 0) return null;
+        
+        const img = images[0];
+        return typeof img === 'string' ? img : img.url || null;
+    };
+
     useEffect(() => {
         // Clear any stored cart data on success
         localStorage.removeItem('jwc_cart_data');
@@ -117,9 +135,9 @@ const OrderSuccess = () => {
                                         {order.items?.slice(0, 3).map((item, idx) => (
                                             <div key={idx} className="flex items-center gap-3 text-sm">
                                                 <div className="w-12 h-16 rounded bg-[#28392e] overflow-hidden shrink-0">
-                                                    {item.product?.images?.[0] && (
+                                                    {getImageUrl(item) && (
                                                         <img 
-                                                            src={typeof item.product.images[0] === 'string' ? item.product.images[0] : item.product.images[0].url} 
+                                                            src={getImageUrl(item)} 
                                                             alt={item.productName} 
                                                             className="w-full h-full object-cover" 
                                                         />

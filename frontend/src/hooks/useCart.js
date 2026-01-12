@@ -115,7 +115,7 @@ export const useAddToCart = () => {
               items: [
                 ...items,
                 {
-                  product: { _id: newItem.productId },
+                  product: newItem.productData || { _id: newItem.productId },
                   variantId: newItem.variantId,
                   quantity: newItem.quantity,
                   size: newItem.size,
@@ -173,7 +173,7 @@ export const useAddToCart = () => {
               items: [
                 ...items,
                 {
-                  product: { _id: newItem.productId },
+                  product: newItem.productData || { _id: newItem.productId },
                   variantId: newItem.variantId,
                   quantity: newItem.quantity,
                   size: newItem.size,

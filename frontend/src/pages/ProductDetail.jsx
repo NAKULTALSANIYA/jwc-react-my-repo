@@ -165,6 +165,15 @@ const ProductDetail = () => {
                 size: selectedSize,
                 color: selectedColor,
                 price: selectedVariant.finalPrice,
+                // Pass full product data for guest cart
+                productData: {
+                    _id: product._id,
+                    name: product.name,
+                    slug: product.slug,
+                    images: product.images,
+                    category: product.category,
+                    variants: product.variants
+                }
             });
             
             // Show success message
