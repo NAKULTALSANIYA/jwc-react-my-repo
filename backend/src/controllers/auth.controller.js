@@ -81,12 +81,20 @@ class AuthController {
       });
 
       // Redirect to frontend with tokens in URL (for localStorage compatibility)
-      const frontendURL = env.FRONTEND_URL;
+      const frontendURL = env.FRONTEND_URL || (env.FRONTEND_URLS ? env.FRONTEND_URLS.split(',')[0].trim() : null);
+      if (!frontendURL) {
+        // If no frontend URL is configured, return a clear error to avoid relative redirects
+        throw new ApiError(500, 'FRONTEND_URL is not configured on the server');
+      }
       const redirectURL = `${frontendURL}/auth/callback?accessToken=${encodeURIComponent(result.accessToken)}&refreshToken=${encodeURIComponent(result.refreshToken)}&userId=${encodeURIComponent(result.user._id)}`;
       res.redirect(redirectURL);
     } catch (error) {
-      const frontendURL = env.FRONTEND_URL;
-      res.redirect(`${frontendURL}/login?error=missing_params`);
+      const frontendURL = env.FRONTEND_URL || (env.FRONTEND_URLS ? env.FRONTEND_URLS.split(',')[0].trim() : null);
+      if (frontendURL) {
+        res.redirect(`${frontendURL}/login?error=missing_params`);
+      } else {
+        res.status(500).json({ success: false, message: 'OAuth callback failed and FRONTEND_URL is not configured' });
+      }
     }
   }
 
