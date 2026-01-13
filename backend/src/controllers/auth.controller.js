@@ -81,11 +81,11 @@ class AuthController {
       });
 
       // Redirect to frontend with tokens in URL (for localStorage compatibility)
-      const frontendURL = env.FRONTEND_URL || 'http://localhost:5173';
+      const frontendURL = env.FRONTEND_URL;
       const redirectURL = `${frontendURL}/auth/callback?accessToken=${encodeURIComponent(result.accessToken)}&refreshToken=${encodeURIComponent(result.refreshToken)}&userId=${encodeURIComponent(result.user._id)}`;
       res.redirect(redirectURL);
     } catch (error) {
-      const frontendURL = env.FRONTEND_URL || 'http://localhost:5173';
+      const frontendURL = env.FRONTEND_URL;
       res.redirect(`${frontendURL}/login?error=missing_params`);
     }
   }
