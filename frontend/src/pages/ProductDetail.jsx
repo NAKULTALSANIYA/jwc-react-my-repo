@@ -22,6 +22,7 @@ const ProductDetail = () => {
     const [selectedColor, setSelectedColor] = useState('');
     const [selectedVariant, setSelectedVariant] = useState(null);
     const [quantity, setQuantity] = useState(1);
+    const [wishlistAnimating, setWishlistAnimating] = useState(false);
 
     // Simple check for MongoDB ObjectId
     const isObjectId = (value) => /^[0-9a-fA-F]{24}$/.test(value);
@@ -54,7 +55,6 @@ const ProductDetail = () => {
             } catch (err) {
                 const apiMessage = err?.response?.data?.message;
                 setError(apiMessage || 'Failed to load product. Please try again.');
-                console.error('Error fetching product:', err);
             } finally {
                 setLoading(false);
             }
@@ -140,6 +140,13 @@ const ProductDetail = () => {
 
     const priceInfo = getPriceInfo();
 
+    // Get available stock for selected variant
+    const getAvailableStock = () => {
+        return selectedVariant?.stock || 0;
+    };
+
+    const availableStock = getAvailableStock();
+
     const wishlistItems = wishlistData?.items || [];
     const currentVariantId = selectedVariant?._id || product?.variants?.[0]?._id;
     const isWishlisted = wishlistItems.some(
@@ -191,7 +198,6 @@ const ProductDetail = () => {
             }, 500);
         } catch (error) {
             alert(error?.response?.data?.message || 'Failed to add to cart. Please try again.');
-            console.error('Error adding to cart:', error);
         }
     };
 
@@ -324,45 +330,66 @@ const ProductDetail = () => {
                         <div className="flex items-center border border-[#28392e] rounded-lg bg-surface-dark w-fit">
                             <button
                                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                className="px-4 py-3 text-white hover:text-primary transition-colors"
+                                disabled={!selectedVariant || availableStock === 0}
+                                className={`px-4 py-3 transition-colors ${
+                                    !selectedVariant || availableStock === 0
+                                        ? 'text-gray-600 cursor-not-allowed'
+                                        : 'text-white hover:text-primary'
+                                }`}
                             >
                                 <Minus />
                             </button>
                             <span className="px-6 text-white font-medium">{quantity}</span>
                             <button
-                                onClick={() => setQuantity(quantity + 1)}
-                                className="px-4 py-3 text-white hover:text-primary transition-colors"
+                                onClick={() => {
+                                    if (selectedVariant && quantity < availableStock) {
+                                        setQuantity(quantity + 1);
+                                    }
+                                }}
+                                disabled={!selectedVariant || availableStock === 0 || quantity >= availableStock}
+                                className={`px-4 py-3 transition-colors ${
+                                    !selectedVariant || availableStock === 0 || quantity >= availableStock
+                                        ? 'text-gray-600 cursor-not-allowed'
+                                        : 'text-white hover:text-primary'
+                                }`}
                             >
                                 <Plus />
                             </button>
                         </div>
+                        {selectedVariant && availableStock > 0 && (
+                            <p className="text-[#9db9a6] text-xs mt-2">Only {availableStock} item(s) available</p>
+                        )}
                     </div>
 
                     {/* Action Buttons */}
                     <div className="flex flex-col sm:flex-row gap-4">
                         <button
                             onClick={handleAddToCart}
-                            disabled={addToCartMutation.isPending || !selectedVariant}
+                            disabled={addToCartMutation.isPending || !selectedVariant || availableStock === 0}
                             className={`flex-1 px-8 py-4 rounded-lg font-bold text-base tracking-wide transition-all duration-300 flex items-center justify-center gap-2 ${
-                                addToCartMutation.isPending || !selectedVariant
+                                addToCartMutation.isPending || !selectedVariant || availableStock === 0
                                     ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                                     : 'bg-primary hover:bg-white hover:text-background-dark text-background-dark shadow-[0_0_20px_rgba(17,212,82,0.3)]'
                             }`}
                         >
                             {addToCartMutation.isPending ? <HourglassIcon /> : <ShoppingCart />}
-                            {addToCartMutation.isPending ? 'Adding...' : 'Add to Cart'}
+                            {availableStock === 0 && selectedVariant ? 'Out of Stock' : addToCartMutation.isPending ? 'Adding...' : 'Add to Cart'}
                         </button>
                         {isAuthenticated && (
                             <button
-                                onClick={() => toggleWishlist(product._id, currentVariantId)}
+                                onClick={() => {
+                                    setWishlistAnimating(true);
+                                    toggleWishlist(product._id, currentVariantId);
+                                    setTimeout(() => setWishlistAnimating(false), 600);
+                                }}
                                 disabled={wishlistBusy || !currentVariantId}
                                 className={`border-2 px-8 py-4 rounded-lg font-bold text-base tracking-wide transition-all duration-300 flex items-center justify-center gap-2 ${
                                     isWishlisted
                                         ? 'bg-secondary text-black border-secondary'
                                         : 'border-secondary hover:bg-secondary hover:text-black text-secondary'
-                                } ${wishlistBusy ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                } ${wishlistBusy ? 'opacity-70 cursor-not-allowed' : ''} ${wishlistAnimating ? 'heart-animate' : ''}`}
                             >
-                                <Heart className={isWishlisted ? 'fill-black' : ''} />
+                                <Heart className={isWishlisted ? 'fill-current' : ''} />
                                 {isWishlisted ? 'Wishlisted' : 'Add to Wishlist'}
                             </button>
                         )}

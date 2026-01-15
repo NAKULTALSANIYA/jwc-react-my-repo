@@ -1,5 +1,12 @@
-// Default to local backend when env is missing to avoid /undefined in dev
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'https://jwc-react.onrender.com').replace(/\/$/, '');
+// Prefer env; otherwise fall back to current origin to avoid hardcoded hosts
+const API_BASE_URL = (() => {
+  const fromEnv = import.meta.env.VITE_API_URL;
+  if (fromEnv) return fromEnv.replace(/\/$/, '');
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return `${window.location.origin}/api`.replace(/\/$/, '');
+  }
+  return '';
+})();
 
 const buildUrl = (path = '') => {
   if (!API_BASE_URL) {
@@ -33,29 +40,30 @@ async function request(path, { method = 'GET', body, token, headers } = {}) {
   });
 
   const data = await response.json().catch(() => null);
-  // If the backend says the session is invalid, clear local state and send the user to login.
-  if (response.status === 401) {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-
-      if (window.location.pathname !== '/login') {
-        window.location.replace('/login');
+  
+  if (!response.ok || data?.success === false) {
+    // Backend sends 'error' field, fallback to 'message'
+    const message = data?.message || data?.error || `Request failed with status ${response.status}`;
+    const error = new Error(message);
+    error.status = response.status;
+    error.details = data?.data;
+    
+    // Only auto-logout on 401 if:
+    // 1. User has a valid token (session exists)
+    // 2. The request is NOT for public endpoints like login
+    const isPublicEndpoint = path.includes('/auth/login') || path.includes('/auth/register') || path.includes('/auth/forgot-password');
+    const hasValidToken = localStorage.getItem('token');
+    
+    if (response.status === 401 && hasValidToken && !isPublicEndpoint) {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        if (window.location.pathname !== '/login') {
+          window.location.replace('/login');
+        }
       }
     }
-
-    const message = data?.message || 'Session expired. Please log in again.';
-    const error = new Error(message);
-    error.status = response.status;
-    error.details = data?.data;
-    throw error;
-  }
-
-  if (!response.ok || data?.success === false) {
-    const message = data?.message || `Request failed with status ${response.status}`;
-    const error = new Error(message);
-    error.status = response.status;
-    error.details = data?.data;
+    
     throw error;
   }
 

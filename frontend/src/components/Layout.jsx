@@ -8,6 +8,9 @@ const Header = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
     const { isAuthenticated } = useIsAuthenticated();
     const cartCount = useCartCount();
+    const location = useLocation();
+
+    const isActive = (path) => location.pathname === path;
 
     return (
         <>
@@ -24,24 +27,16 @@ const Header = () => {
 
                         {/* Desktop Menu */}
                         <nav className="hidden lg:flex items-center gap-8 ml-8">
-                            <Link to="/" className="text-white/80 hover:text-secondary text-sm font-medium transition-colors">Home</Link>
-                            <Link to="/Products" className="text-white/80 hover:text-secondary text-sm font-medium transition-colors">Products</Link>
-                            <Link to="/collection" className="text-white/80 hover:text-secondary text-sm font-medium transition-colors">Collection</Link>
-                            <Link to="/new-arrivals" className="text-white/80 hover:text-secondary text-sm font-medium transition-colors">New Arrivals</Link>
+                            <Link to="/" className={`text-sm font-medium transition-colors ${isActive('/') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>Home</Link>
+                            <Link to="/Products" className={`text-sm font-medium transition-colors ${isActive('/Products') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>Products</Link>
+                            <Link to="/collection" className={`text-sm font-medium transition-colors ${isActive('/collection') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>Collection</Link>
+                            <Link to="/new-arrivals" className={`text-sm font-medium transition-colors ${isActive('/new-arrivals') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>New Arrivals</Link>
+                            <Link to="/about-us" className={`text-sm font-medium transition-colors ${isActive('/about-us') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>About Us</Link>
+                            <Link to="/contact-us" className={`text-sm font-medium transition-colors ${isActive('/contact-us') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>Contact Us</Link>
                         </nav>
                     </div>
 
                     <div className="flex items-center gap-4 md:gap-6">
-                        {/* Search (Desktop) */}
-                        <div className="hidden md:flex items-center bg-[#28392e] rounded-full px-3 py-1.5 w-64 border border-transparent focus-within:border-secondary transition-colors">
-                            <Search size={20} className="text-[#9db9a6]" />
-                            <input
-                                type="text"
-                                placeholder="Search for luxury..."
-                                className="bg-transparent border-none text-white text-sm focus:ring-0 placeholder:text-[#9db9a6] w-full py-1 outline-none"
-                            />
-                        </div>
-
                         {/* Icons */}
                         <div className="flex items-center gap-3">
                             <Link to="/cart" className="relative flex items-center justify-center size-10 rounded-full hover:bg-[#28392e] text-white transition-colors">
@@ -87,10 +82,12 @@ const Header = () => {
                             </div>
                             <nav className="flex-1 overflow-y-auto p-6">
                                 <div className="flex flex-col gap-4">
-                                    <Link to="/" onClick={() => setMobileMenuOpen(false)} className="text-white hover:text-secondary text-base font-medium transition-colors py-2">Home</Link>
-                                    <Link to="/products" onClick={() => setMobileMenuOpen(false)} className="text-white hover:text-secondary text-base font-medium transition-colors py-2">Products</Link>
-                                    <Link to="/collection" onClick={() => setMobileMenuOpen(false)} className="text-white hover:text-secondary text-base font-medium transition-colors py-2">Collection</Link>
-                                    <Link to="/new-arrivals" onClick={() => setMobileMenuOpen(false)} className="text-white hover:text-secondary text-base font-medium transition-colors py-2">New Arrivals</Link>
+                                    <Link to="/" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>Home</Link>
+                                    <Link to="/Products" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/Products') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>Products</Link>
+                                    <Link to="/collection" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/collection') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>Collection</Link>
+                                    <Link to="/new-arrivals" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/new-arrivals') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>New Arrivals</Link>
+                                    <Link to="/about-us" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/about-us') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>About Us</Link>
+                                    <Link to="/contact-us" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/contact-us') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>Contact Us</Link>
                                 </div>
                             </nav>
                             <div className="p-6 border-t border-[#28392e]">
@@ -145,7 +142,8 @@ const Footer = () => {
                             <li><Link to="#" className="hover:text-primary transition-colors">Track Order</Link></li>
                             <li><Link to="#" className="hover:text-primary transition-colors">Returns & Exchanges</Link></li>
                             <li><Link to="#" className="hover:text-primary transition-colors">Size Guide</Link></li>
-                            <li><Link to="#" className="hover:text-primary transition-colors">Contact Us</Link></li>
+                            <li><Link to="/about-us" className="hover:text-primary transition-colors">About Us</Link></li>
+                            <li><Link to="/contact-us" className="hover:text-primary transition-colors">Contact Us</Link></li>
                         </ul>
                     </div>
 

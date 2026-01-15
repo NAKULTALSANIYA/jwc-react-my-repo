@@ -17,7 +17,6 @@ const OAuthCallback = () => {
         const errorParam = searchParams.get('error');
 
         if (errorParam) {
-          console.error('OAuth error:', errorParam);
           navigate('/login?error=oauth_failed');
           return;
         }
@@ -35,18 +34,15 @@ const OAuthCallback = () => {
               tokenManager.setUser(user);
             }
           } catch (err) {
-            console.error('Failed to fetch user profile:', err);
             // Continue anyway, user will be fetched by useUser hook
           }
           
           // Redirect to home
           navigate('/products');
         } else {
-          console.error('Missing required OAuth callback parameters');
           navigate('/login?error=missing_params');
         }
       } catch (err) {
-        console.error('OAuth callback error:', err);
         setError('Authentication failed. Please try again.');
         setTimeout(() => {
           navigate('/login?error=callback_error');

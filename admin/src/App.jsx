@@ -7,6 +7,7 @@ import AddEditProduct from './pages/AddEditProduct';
 import Customers from './pages/Customers';
 import Orders from './pages/Orders';
 import OrderDetail from './pages/OrderDetail';
+import Contacts from './pages/Contacts';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProtectedLayout from './components/ProtectedLayout';
@@ -26,6 +27,7 @@ function App() {
             <Route path="/orders" element={<Orders />} />
             <Route path="/order-detail/:orderId" element={<OrderDetail />} />
             <Route path="/customers" element={<Customers />} />
+            <Route path="/contacts" element={<Contacts />} />
           </Route>
         </Route>
         <Route path="*" element={<Login />} />

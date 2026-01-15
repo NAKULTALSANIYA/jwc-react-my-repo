@@ -52,7 +52,7 @@ const Orders = () => {
             const filename = `orders_${new Date().toISOString().slice(0, 10)}.xlsx`;
             XLSX.writeFile(workbook, filename);
         } catch (e) {
-            console.error('Failed to export orders:', e);
+            // Handle error silently
         }
     };
 

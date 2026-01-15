@@ -133,7 +133,6 @@ const Dashboard = () => {
                 setRecentOrders(recentRes?.orders || recentRes || []);
             } catch (err) {
                 if (active) {
-                    console.error('Dashboard API Error:', err);
                     setError(err.message || 'Unable to load dashboard data');
                 }
             } finally {
@@ -212,7 +211,7 @@ const Dashboard = () => {
                 <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm min-w-0">
                     <div className="flex justify-between items-center mb-6">
                         <h3 className="font-bold text-lg">Sales Overview</h3>
-                        <select 
+                        <select
                             value={timePeriod}
                             onChange={(e) => setTimePeriod(e.target.value)}
                             className="bg-slate-50 border border-slate-200 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-lg px-3 py-1.5 text-slate-700 cursor-pointer"

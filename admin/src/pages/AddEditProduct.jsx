@@ -31,6 +31,7 @@ const AddEditProduct = () => {
         tags: [],
         careInstructions: '',
         weight: '',
+        status: 'active',
         isActive: true,
         isFeatured: false,
         images: [],
@@ -63,7 +64,7 @@ const AddEditProduct = () => {
             const data = await adminApi.categories();
             setCategories(data?.categories || data || []);
         } catch (err) {
-            console.error('Failed to load categories:', err);
+            // Handle error silently
         }
     };
 
@@ -85,6 +86,7 @@ const AddEditProduct = () => {
                 tags: product.tags || [],
                 careInstructions: product.careInstructions || '',
                 weight: product.weight || '',
+                status: product.status || 'active',
                 isActive: product.isActive !== false,
                 isFeatured: product.isFeatured || false,
                 images: product.images || [],
@@ -226,7 +228,6 @@ const AddEditProduct = () => {
                 }));
             }
         } catch (err) {
-            console.error('Image upload error:', err);
             alert(err.message || 'Failed to upload image. Please try again or use URL instead.');
         } finally {
             setUploadingImage(false);
@@ -757,6 +758,21 @@ const AddEditProduct = () => {
                                 className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Enter care instructions"
                             />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Status</label>
+                            <select
+                                name="status"
+                                value={formData.status}
+                                onChange={handleInputChange}
+                                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="draft">Draft</option>
+                                <option value="active">Active</option>
+                                <option value="out_of_stock">Out of Stock</option>
+                                <option value="discontinued">Discontinued</option>
+                            </select>
                         </div>
 
                         <div className="flex gap-6">

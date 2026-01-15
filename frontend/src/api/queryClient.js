@@ -21,13 +21,6 @@ export const queryClient = new QueryClient({
 export const handleQueryError = (error) => {
   const message = error?.response?.data?.message || error?.message || 'An error occurred';
   
-  // Log error for debugging
-  console.error('Query Error:', {
-    message,
-    status: error?.response?.status,
-    data: error?.response?.data,
-  });
-
   return message;
 };
 

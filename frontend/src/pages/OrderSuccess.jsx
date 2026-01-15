@@ -8,6 +8,33 @@ const OrderSuccess = () => {
     const { data: orderData, isLoading } = useOrder(orderId);
     const order = orderData?.order;
 
+    const getOrderStatusClasses = (status) => {
+        const s = (status || '').toLowerCase();
+        switch (s) {
+            case 'pending':
+            case 'awaiting_payment':
+                return 'bg-yellow-500/20 text-yellow-500';
+            case 'processing':
+            case 'confirmed':
+                return 'bg-blue-500/20 text-blue-500';
+            case 'shipped':
+            case 'in_transit':
+                return 'bg-indigo-500/20 text-indigo-500';
+            case 'delivered':
+            case 'completed':
+                return 'bg-green-500/20 text-green-500';
+            case 'cancelled':
+            case 'canceled':
+            case 'failed':
+                return 'bg-red-500/20 text-red-500';
+            case 'returned':
+            case 'refunded':
+                return 'bg-purple-500/20 text-purple-500';
+            default:
+                return 'bg-gray-500/20 text-gray-300';
+        }
+    };
+
     const getImageUrl = (item) => {
         const product = item?.product;
         if (!product) return null;
@@ -91,7 +118,7 @@ const OrderSuccess = () => {
                                     <div>
                                         <p className="text-white/60 text-sm mb-1">Order Status</p>
                                         <div className="flex items-center gap-2">
-                                            <span className="px-3 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-500">
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${getOrderStatusClasses(order.status)}`}>
                                                 {order.status?.toUpperCase()}
                                             </span>
                                         </div>

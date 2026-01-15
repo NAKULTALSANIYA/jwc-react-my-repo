@@ -335,7 +335,7 @@ const OrderDetail = () => {
                                     <div className="flex-1">
                                         <p className="font-semibold">{item.product?.name || item.productName}</p>
                                         <p className="text-sm text-slate-500">
-                                            Size: {item.size} | Color: {item.color}
+                                            Size: {item.variantDetails?.size || item.size || 'N/A'} | Color: {item.variantDetails?.color || item.color || 'N/A'}
                                         </p>
                                         <p className="text-sm text-slate-500">
                                             Quantity: {item.quantity} × {formatCurrency(item.finalPrice || item.price)}

@@ -200,7 +200,6 @@ const Checkout = () => {
                         // Navigate to order success page
                         navigate(`/order/${createdOrder._id}/success`);
                     } catch (err) {
-                        console.error('Payment verification failed', err);
                         const message = err?.response?.data?.message || err.message || 'Payment verification failed. Please contact support.';
                         alert(message);
                         // Order was NOT created, so user can retry
@@ -208,7 +207,6 @@ const Checkout = () => {
                 },
                 modal: {
                     ondismiss: () => {
-                        console.warn('Payment popup closed by user - order was NOT created');
                         alert('Payment cancelled. Your order was not created. Please try again.');
                     },
                 },
@@ -219,7 +217,6 @@ const Checkout = () => {
 
             rzp.open();
         } catch (err) {
-            console.error('Checkout error', err);
             const errorMessage = err?.response?.data?.message || err.message || 'Checkout failed. Please try again.';
             
             // Check if it's a validation error from backend

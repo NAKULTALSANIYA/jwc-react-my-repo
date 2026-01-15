@@ -200,8 +200,8 @@ const Login = () => {
     };
 
     const { title, description } = getHeaderContent();
-    const isLoading = loginMutation.isPending || forgotPasswordMutation.isPending || 
-                     verifyOTPMutation.isPending || resetPasswordMutation.isPending;
+    const isLoading = loginMutation.isPending || forgotPasswordMutation.isPending ||
+        verifyOTPMutation.isPending || resetPasswordMutation.isPending;
 
     return (
         <div className="flex-1 flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
@@ -299,10 +299,14 @@ const Login = () => {
                                             required
                                         />
                                         <div className="flex items-center justify-center px-4 bg-[#1a261e] border border-l-0 border-[#28392c] rounded-r-lg group-hover:border-[#3b5441] transition-colors">
-                                            <button 
-                                                className="text-[#9db9a6] hover:text-secondary focus:outline-none transition-colors" 
+                                            <button
+                                                className="text-[#9db9a6] hover:text-secondary focus:outline-none transition-colors"
                                                 type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    setShowPassword(!showPassword);
+                                                }}
                                             >
                                                 {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                                             </button>
@@ -311,7 +315,7 @@ const Login = () => {
                                 </label>
 
                                 {/* Login Button */}
-                                <button 
+                                <button
                                     type="submit"
                                     disabled={isLoading}
                                     className="mt-4 flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 bg-primary text-[#111813] text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#0bc038] hover:shadow-[0_0_15px_rgba(13,201,60,0.4)] transition-all duration-300 transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
@@ -334,8 +338,8 @@ const Login = () => {
 
                                 {/* Social Login */}
                                 <div className="grid gap-4">
-                                    <button 
-                                        className="flex items-center cursor-pointer justify-center gap-3 rounded-lg border border-[#28392c] bg-[#1a261e] h-12 hover:bg-[#28392c] hover:border-[#9db9a6]/30 transition-all" 
+                                    <button
+                                        className="flex items-center cursor-pointer justify-center gap-3 rounded-lg border border-[#28392c] bg-[#1a261e] h-12 hover:bg-[#28392c] hover:border-[#9db9a6]/30 transition-all"
                                         type="button"
                                         onClick={initiateGoogleLogin}
                                     >
@@ -362,7 +366,7 @@ const Login = () => {
                                     />
                                 </label>
 
-                                <button 
+                                <button
                                     type="submit"
                                     disabled={isLoading}
                                     className="mt-4 flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 bg-primary text-[#111813] text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#0bc038] hover:shadow-[0_0_15px_rgba(13,201,60,0.4)] transition-all duration-300 transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
@@ -401,7 +405,7 @@ const Login = () => {
                                     <p className="text-xs text-[#9db9a6]/70">Enter the 6-digit code from your email</p>
                                 </label>
 
-                                <button 
+                                <button
                                     type="submit"
                                     disabled={isLoading || resetData.otp.length !== 6}
                                     className="mt-4 flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 bg-primary text-[#111813] text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#0bc038] hover:shadow-[0_0_15px_rgba(13,201,60,0.4)] transition-all duration-300 transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
@@ -455,10 +459,14 @@ const Login = () => {
                                             required
                                         />
                                         <div className="flex items-center justify-center px-4 bg-[#1a261e] border border-l-0 border-[#28392c] rounded-r-lg group-hover:border-[#3b5441] transition-colors">
-                                            <button 
-                                                className="text-[#9db9a6] hover:text-secondary focus:outline-none transition-colors" 
+                                            <button
+                                                className="text-[#9db9a6] hover:text-secondary focus:outline-none transition-colors"
                                                 type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    setShowPassword(!showPassword);
+                                                }}
                                             >
                                                 {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                                             </button>
@@ -480,7 +488,7 @@ const Login = () => {
                                     />
                                 </label>
 
-                                <button 
+                                <button
                                     type="submit"
                                     disabled={isLoading}
                                     className="mt-4 flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 bg-primary text-[#111813] text-base font-bold leading-normal tracking-[0.015em] hover:bg-[#0bc038] hover:shadow-[0_0_15px_rgba(13,201,60,0.4)] transition-all duration-300 transform active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"

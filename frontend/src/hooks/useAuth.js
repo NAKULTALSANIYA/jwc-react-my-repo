@@ -59,9 +59,6 @@ export const useRegister = () => {
         navigate('/login');
       }
     },
-    onError: (error) => {
-      console.error('Registration error:', error);
-    },
   });
 };
 
@@ -82,7 +79,6 @@ export const useLogout = () => {
       navigate('/login');
     },
     onError: (error) => {
-      console.error('Logout error:', error);
       // Clear cache anyway
       queryClient.clear();
       navigate('/login');
@@ -138,9 +134,6 @@ export const useUpdateProfile = () => {
       queryClient.setQueryData(queryKeys.auth.user, updatedUser);
       tokenManager.setUser(updatedUser);
     },
-    onError: (error) => {
-      console.error('Update profile error:', error);
-    },
   });
 };
 
@@ -161,9 +154,6 @@ export const useGoogleLogin = () => {
       queryClient.setQueryData(queryKeys.auth.user, user);
       navigate('/products');
     },
-    onError: (error) => {
-      console.error('Google login error:', error);
-    },
   });
 };
 
@@ -173,9 +163,6 @@ export const useGoogleLogin = () => {
 export const useForgotPassword = () => {
   return useMutation({
     mutationFn: authService.forgotPassword,
-    onError: (error) => {
-      console.error('Forgot password error:', error);
-    },
   });
 };
 
@@ -185,9 +172,6 @@ export const useForgotPassword = () => {
 export const useVerifyOTP = () => {
   return useMutation({
     mutationFn: ({ resetSessionId, otp }) => authService.verifyOTP(resetSessionId, otp),
-    onError: (error) => {
-      console.error('Verify OTP error:', error);
-    },
   });
 };
 
@@ -197,9 +181,6 @@ export const useVerifyOTP = () => {
 export const useResendOTP = () => {
   return useMutation({
     mutationFn: authService.resendOTP,
-    onError: (error) => {
-      console.error('Resend OTP error:', error);
-    },
   });
 };
 
@@ -214,9 +195,6 @@ export const useResetPassword = () => {
     onSuccess: () => {
       // Navigate to login after successful password reset
       navigate('/login');
-    },
-    onError: (error) => {
-      console.error('Reset password error:', error);
     },
   });
 };

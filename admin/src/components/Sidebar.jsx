@@ -6,6 +6,7 @@ import {
     ShoppingBag,
     ShoppingCart,
     Users,
+    Mail,
     LogOut,
     ChevronRight,
     X
@@ -22,6 +23,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { name: 'Products', icon: <ShoppingBag size={20} />, path: '/products' },
         { name: 'Orders', icon: <ShoppingCart size={20} />, path: '/orders' },
         { name: 'Customers', icon: <Users size={20} />, path: '/customers' },
+        { name: 'Contacts', icon: <Mail size={20} />, path: '/contacts' },
     ];
 
     const handleLogoutClick = () => {

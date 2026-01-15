@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useRegister, initiateGoogleLogin } from '../hooks/useAuth';
+import { Eye, EyeOff } from 'lucide-react';
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ const Register = () => {
         email: '',
         password: '',
     });
+    const [showPassword, setShowPassword] = useState(false);
     const [displayError, setDisplayError] = useState(null);
 
     const registerMutation = useRegister();
@@ -41,7 +43,6 @@ const Register = () => {
                     errorMsg = error.message;
                 }
                 
-                console.error('Register error:', error);
                 setDisplayError(errorMsg);
             },
         });
@@ -121,15 +122,30 @@ const Register = () => {
 
                         <label className="flex flex-col gap-2">
                             <span className="text-white text-sm font-medium leading-normal">Password</span>
-                            <input 
-                                type="password" 
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                placeholder="Create a password" 
-                                className="flex w-full rounded-lg text-white border border-[#28392c] bg-[#1a261e] h-14 placeholder:text-[#9db9a6]/40 px-4 text-base transition-all focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary" 
-                                required
-                            />
+                            <div className="relative flex w-full rounded-lg group">
+                                <input 
+                                    type={showPassword ? 'text' : 'password'}
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    placeholder="Create a password" 
+                                    className="flex-1 rounded-l-lg rounded-r-none text-white border border-r-0 border-[#28392c] bg-[#1a261e] h-14 placeholder:text-[#9db9a6]/40 px-4 text-base font-normal leading-normal transition-all duration-200 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary z-0 group-hover:border-[#3b5441]"
+                                    required
+                                />
+                                <div className="flex items-center justify-center px-4 bg-[#1a261e] border border-l-0 border-[#28392c] rounded-r-lg group-hover:border-[#3b5441] transition-colors">
+                                    <button 
+                                        className="text-[#9db9a6] hover:text-secondary focus:outline-none transition-colors" 
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setShowPassword(!showPassword);
+                                        }}
+                                    >
+                                        {showPassword ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+                                    </button>
+                                </div>
+                            </div>
                         </label>
 
                         <button 

@@ -17,6 +17,42 @@ html {
   min-height: 100%;
 }
 
+/* Heart favorite animation */
+@keyframes heartBeat {
+  0% {
+    transform: scale(1);
+  }
+  10%, 20% {
+    transform: scale(0.9) translateY(-2px);
+  }
+  30%, 50%, 70%, 90% {
+    transform: scale(1.1);
+  }
+  40%, 60%, 80% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes heartPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.heart-animate {
+  animation: heartBeat 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.heart-pulse {
+  animation: heartPulse 0.3s ease-in-out;
+}
+
 body {
   background-color: #102216;
   min-height: 100vh;

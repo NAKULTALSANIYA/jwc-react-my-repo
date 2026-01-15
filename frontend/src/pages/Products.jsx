@@ -22,6 +22,7 @@ const Products = () => {
     const [availableSizes, setAvailableSizes] = useState([]);
     const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
     const [quickViewProduct, setQuickViewProduct] = useState(null);
+    const [animatingHearts, setAnimatingHearts] = useState({});
 
     const { toggleWishlist, isLoading: wishlistBusy } = useToggleWishlist();
     const { data: wishlistData } = useWishlist();
@@ -76,7 +77,7 @@ const Products = () => {
     const fetchProducts = useCallback(async () => {
         try {
             setLoading(true);
-            const response = await getProducts({ gender: 'Men', isActive: true, status: 'active', limit: 100 });
+            const response = await getProducts({ isActive: true, status: 'active', limit: 100 });
             const apiProducts = response?.data?.products || response?.products || response?.data?.data?.products || [];
             const normalized = apiProducts.map(normalizeProduct);
 
@@ -98,7 +99,6 @@ const Products = () => {
 
             setError('');
         } catch (err) {
-            console.error('Error fetching products:', err);
             setError('Failed to load products. Please try again.');
         } finally {
             setLoading(false);
@@ -382,10 +382,15 @@ const Products = () => {
                                             <button
                                                 onClick={(e) => {
                                                     e.preventDefault();
+                                                    setAnimatingHearts(prev => ({ ...prev, [productId]: true }));
                                                     toggleWishlist(productId, variantId);
+                                                    setTimeout(() => {
+                                                        setAnimatingHearts(prev => ({ ...prev, [productId]: false }));
+                                                    }, 600);
                                                 }}
                                                 className={clsx(
                                                     "absolute top-3 right-3 size-8 rounded-full backdrop-blur-sm flex items-center justify-center transition-colors border",
+                                                    animatingHearts[productId] && "heart-animate",
                                                     wishlisted
                                                         ? "bg-primary text-black border-primary"
                                                         : "bg-black/40 text-white hover:bg-primary hover:text-black border-transparent"
@@ -393,7 +398,7 @@ const Products = () => {
                                                 aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
                                                 disabled={wishlistBusy || !variantId}
                                             >
-                                                <Heart className="w-4 h-4" />
+                                                <Heart className={clsx("w-4 h-4", wishlisted && "fill-current")} />
                                             </button>
                                         )}
                                         <div className="absolute inset-x-0 bottom-0 p-3 md:p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center bg-gradient-to-t from-black/80 to-transparent pt-10">

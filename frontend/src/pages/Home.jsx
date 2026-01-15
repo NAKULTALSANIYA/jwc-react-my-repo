@@ -191,29 +191,6 @@ const Home = () => {
                     </div>
                 </div>
             </section>
-
-            {/* Newsletter Section */}
-            <section className="py-20 px-4 relative overflow-hidden">
-                <div
-                    className="absolute inset-0 z-0 opacity-10"
-                    style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDsElhq1KFUjuk7VxkqX8z1ukpgMplnsSPKhlm8OLdGVM3wSVti5GohagZNcPfTM2RGrRHcjBjnvTgM5fcEUg1x3WDoq7QZ5a4w_kBuHLVwPC2XBSx978e3tc0e9HErx2jBbgx2tvbTsbx1fvUe10cRdSNrh56N8NSL--i2bBYpJPP2_JMhMV4-Hd471rLdgSAiHbdQ3QQboC-NExub86N-0v8-V4gS92uJ3L6S_OP2NO9ksjlhPxvMKOEF5pEqvAhoWFuoPdqPkTSf')" }}
-                >
-                </div>
-                <div className="relative z-10 max-w-2xl mx-auto text-center">
-                    <h2 className="text-3xl font-bold text-white mb-4">Join the Jalaram Family</h2>
-                    <p className="text-white/70 mb-8 font-body">Subscribe to receive updates, access to exclusive deals, and more.</p>
-                    <form className="flex flex-col sm:flex-row gap-4" onSubmit={(e) => e.preventDefault()}>
-                        <input
-                            type="email"
-                            placeholder="Enter your email address"
-                            className="flex-1 bg-surface-dark border border-[#28392e] text-white px-6 py-3 rounded-lg focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary placeholder:text-white/30"
-                        />
-                        <button type="submit" className="bg-secondary hover:bg-white hover:text-background-dark text-background-dark font-bold py-3 px-8 rounded-lg transition-colors">
-                            Subscribe
-                        </button>
-                    </form>
-                </div>
-            </section>
         </>
     );
 };

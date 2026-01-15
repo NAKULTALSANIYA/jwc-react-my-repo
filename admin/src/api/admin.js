@@ -52,6 +52,13 @@ export const adminApi = {
     files.forEach(file => formData.append('images', file));
     return apiClient.post('/api/upload/images', formData);
   },
+
+  // Contacts
+  getContacts: (params = {}) => apiClient.get(`/api/contact${toQuery(params)}`),
+  getContactStats: () => apiClient.get('/api/contact/stats'),
+  updateContactStatus: (id, payload) => apiClient.patch(`/api/contact/${id}/status`, payload),
+  addAdminNotes: (id, payload) => apiClient.patch(`/api/contact/${id}/notes`, payload),
+  deleteContact: (id) => apiClient.del(`/api/contact/${id}`),
 };
 
 export { toQuery };

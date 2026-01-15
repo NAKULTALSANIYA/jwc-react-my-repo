@@ -16,6 +16,8 @@ import ProductDetail from './pages/ProductDetail';
 import OAuthCallback from './pages/OAuthCallback';
 import Profile from './pages/Profile';
 import OrderSuccess from './pages/OrderSuccess';
+import ContactUs from './pages/ContactUs';
+import AboutUs from './pages/AboutUs';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -28,6 +30,8 @@ function App() {
             <Route path="Products" element={<Products />} />
             <Route path="collection" element={<Collection />} />
             <Route path="new-arrivals" element={<NewArrivals />} />
+            <Route path="contact-us" element={<ContactUs />} />
+            <Route path="about-us" element={<AboutUs />} />
             <Route path="cart" element={<Cart />} />
             <Route path="checkout" element={<Checkout />} />
             <Route path="order/:orderId/success" element={<OrderSuccess />} />
