@@ -1,10 +1,14 @@
+import { createServer } from 'http';
 import env from './src/config/env.js';
 import { logger } from './src/utils/logger.js';
 import app from './src/app.js';
+import { initSocketServer } from './src/utils/socket.js';
 
 const PORT = env.PORT || 5000;
+const httpServer = createServer(app);
+export const io = initSocketServer(httpServer);
 
-const server = app.listen(PORT, () => {
+const server = httpServer.listen(PORT, () => {
   logger.info(`Server running on port ${PORT} in ${env.NODE_ENV} mode`);
 });
 

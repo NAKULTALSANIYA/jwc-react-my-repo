@@ -5,6 +5,7 @@ import PaymentService from './payment.service.js';
 import UserService from './user.service.js';
 import ApiError from '../utils/ApiError.js';
 import { logger } from '../utils/logger.js';
+import { emitOrderUpdated } from '../utils/socket.js';
 
 class OrderService {
   async createOrder(userId, orderData) {
@@ -327,6 +328,8 @@ class OrderService {
       if (status === 'cancelled' && order.status !== 'cancelled') {
         await InventoryService.processReturnStock(order.items, orderId, userId);
       }
+
+      emitOrderUpdated(updatedOrder);
 
       logger.info(`Order status updated: ${order.orderNumber} from ${order.status} to ${status}`);
       return updatedOrder;

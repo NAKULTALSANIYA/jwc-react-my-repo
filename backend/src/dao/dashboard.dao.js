@@ -19,9 +19,25 @@ class DashboardDAO {
         $group: {
           _id: null,
           totalOrders: { $sum: 1 },
-          totalRevenue: { $sum: '$pricing.finalAmount' },
+          totalRevenue: {
+            $sum: {
+              $cond: [
+                { $in: ['$status', ['cancelled', 'returned', 'refunded']] },
+                0,
+                '$pricing.finalAmount'
+              ]
+            }
+          },
           totalCustomers: { $addToSet: '$user' },
-          avgOrderValue: { $avg: '$pricing.finalAmount' },
+          avgOrderValue: {
+            $avg: {
+              $cond: [
+                { $in: ['$status', ['cancelled', 'returned', 'refunded']] },
+                null,
+                '$pricing.finalAmount'
+              ]
+            }
+          },
           pendingOrders: {
             $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] }
           },
@@ -99,9 +115,25 @@ class DashboardDAO {
         $group: {
           _id: null,
           totalOrders: { $sum: 1 },
-          totalRevenue: { $sum: '$pricing.finalAmount' },
+          totalRevenue: {
+            $sum: {
+              $cond: [
+                { $in: ['$status', ['cancelled', 'returned', 'refunded']] },
+                0,
+                '$pricing.finalAmount'
+              ]
+            }
+          },
           totalCustomers: { $addToSet: '$user' },
-          avgOrderValue: { $avg: '$pricing.finalAmount' },
+          avgOrderValue: {
+            $avg: {
+              $cond: [
+                { $in: ['$status', ['cancelled', 'returned', 'refunded']] },
+                null,
+                '$pricing.finalAmount'
+              ]
+            }
+          },
           pendingOrders: {
             $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] }
           },
@@ -215,7 +247,8 @@ class DashboardDAO {
       {
         $match: {
           createdAt: { $gte: startDate, $lte: endDate },
-          paymentStatus: 'paid'
+          paymentStatus: 'paid',
+          status: { $nin: ['cancelled', 'returned', 'refunded'] }
         }
       },
       {

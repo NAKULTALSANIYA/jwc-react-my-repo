@@ -2,6 +2,7 @@ import OrderService from '../services/order.service.js';
 import PaymentService from '../services/payment.service.js';
 import ApiResponse from '../utils/ApiResponse.js';
 import ApiError from '../utils/ApiError.js';
+import { emitOrderCreated } from '../utils/socket.js';
 
 class OrderController {
   async createOrder(req, res, next) {
@@ -10,8 +11,11 @@ class OrderController {
       const orderData = req.body;
 
       const order = await OrderService.createOrder(userId, orderData);
+      const hydratedOrder = await OrderService.getOrderById(order._id);
+
+      emitOrderCreated(hydratedOrder);
       
-      return ApiResponse.success(res, 'Order created successfully', { order });
+      return ApiResponse.success(res, 'Order created successfully', { order: hydratedOrder });
     } catch (error) {
       next(error);
     }
@@ -270,8 +274,12 @@ class OrderController {
         userId
       );
 
+      const hydratedOrder = await OrderService.getOrderById(order._id);
+
+      emitOrderCreated(hydratedOrder);
+
       return ApiResponse.success(res, 'Payment verified and order created successfully', {
-        order,
+        order: hydratedOrder,
         payment,
       });
     } catch (error) {

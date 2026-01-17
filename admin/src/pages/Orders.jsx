@@ -8,7 +8,9 @@ import {
     Clock
 } from 'lucide-react';
 import { adminApi } from '../api/admin';
+import { getAdminSocket } from '../api/socket';
 import Loader from '../components/Loader';
+import { useAuth } from '../hooks/useAuth';
 import * as XLSX from 'xlsx';
 
 const formatCurrency = (value = 0) => `₹${Number(value || 0).toLocaleString('en-IN', {
@@ -26,6 +28,7 @@ const formatDate = (value) => {
 
 const Orders = () => {
     const navigate = useNavigate();
+    const { token } = useAuth();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -81,6 +84,47 @@ const Orders = () => {
             active = false;
         };
     }, []);
+
+    // Listen for live order events and keep the list in sync without reloads
+    useEffect(() => {
+        if (!token) return undefined;
+
+        const socket = getAdminSocket(token);
+        const getId = (order) => order?._id || order?.id || order?.orderNumber;
+
+        const handleOrderCreated = ({ order }) => {
+            if (!order) return;
+            setOrders((prev) => {
+                const incomingId = getId(order);
+                const filtered = prev.filter((item) => getId(item) !== incomingId);
+                return [order, ...filtered];
+            });
+        };
+
+        const handleOrderUpdated = ({ order }) => {
+            if (!order) return;
+            setOrders((prev) => {
+                const incomingId = getId(order);
+                const exists = prev.some((item) => getId(item) === incomingId);
+                if (!exists) return [order, ...prev];
+                return prev.map((item) => (getId(item) === incomingId ? order : item));
+            });
+        };
+
+        const handleSocketError = () => {
+            setError((prev) => prev || 'Live updates are unavailable right now.');
+        };
+
+        socket.on('order:created', handleOrderCreated);
+        socket.on('order:updated', handleOrderUpdated);
+        socket.on('connect_error', handleSocketError);
+
+        return () => {
+            socket.off('order:created', handleOrderCreated);
+            socket.off('order:updated', handleOrderUpdated);
+            socket.off('connect_error', handleSocketError);
+        };
+    }, [token]);
 
     return (
         <div className="space-y-8">
