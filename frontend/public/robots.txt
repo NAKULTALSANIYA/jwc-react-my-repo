@@ -1,0 +1,37 @@
+# Disallow admin access
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+
+# Disallow user-specific pages
+Disallow: /cart
+Disallow: /checkout
+Disallow: /profile
+Disallow: /login
+Disallow: /register
+Disallow: /auth/
+
+# Disallow order pages (they're dynamic and user-specific)
+Disallow: /order/
+
+# Allow everything else
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.yoursite.com/sitemap.xml
+
+# Crawl delay (optional, adjust based on server capacity)
+# Crawl-delay: 1
+
+# Specific bot rules (optional)
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Block bad bots (optional - add as needed)
+User-agent: SemrushBot
+User-agent: AhrefsBot
+User-agent: MJ12bot
+Disallow: /
