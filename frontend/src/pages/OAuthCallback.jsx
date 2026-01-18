@@ -33,7 +33,7 @@ const OAuthCallback = () => {
             if (user) {
               tokenManager.setUser(user);
             }
-          } catch (err) {
+          } catch {
             // Continue anyway, user will be fetched by useUser hook
           }
           
@@ -42,7 +42,7 @@ const OAuthCallback = () => {
         } else {
           navigate('/login?error=missing_params');
         }
-      } catch (err) {
+      } catch {
         setError('Authentication failed. Please try again.');
         setTimeout(() => {
           navigate('/login?error=callback_error');

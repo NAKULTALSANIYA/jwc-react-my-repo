@@ -3,8 +3,13 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { getProductById, getProductBySlug } from '../api/services/product.service';
 import { useAddToCart } from '../hooks/useCart';
 import { useToggleWishlist, useWishlist } from '../hooks/useExtras';
+import { useToast } from '../components/Toast';
 import { tokenManager } from '../api/axios';
 import { Minus, Plus, ShoppingCart, Heart, CheckCircle, XCircle, Truck, ShieldCheck, RefreshCw, HourglassIcon } from 'lucide-react';
+
+const Skeleton = ({ className }) => (
+    <div className={`bg-[#1f2a22] rounded-md animate-pulse ${className}`} />
+);
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -12,6 +17,7 @@ const ProductDetail = () => {
     const addToCartMutation = useAddToCart();
     const { toggleWishlist, isLoading: wishlistBusy } = useToggleWishlist();
     const { data: wishlistData } = useWishlist();
+    const { success: showSuccess, error: showError } = useToast();
     
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -27,21 +33,22 @@ const ProductDetail = () => {
     // Simple check for MongoDB ObjectId
     const isObjectId = (value) => /^[0-9a-fA-F]{24}$/.test(value);
 
-    // Legacy numeric ids (1-6) mapped to seeded slugs for backward compatibility
-    const legacySlugMap = {
-        '1': 'royal-gold-silk-sherwani',
-        '2': 'emerald-velvet-indo-western',
-        '3': 'ivory-cotton-silk-kurta',
-        '4': 'maroon-jodhpuri-set',
-        '5': 'navy-blue-bandhgala',
-        '6': 'golden-jacquard-jacket',
-    };
 
     // Fetch product data (supports both ObjectId and slug)
     useEffect(() => {
         const fetchProduct = async () => {
             try {
                 setLoading(true);
+                // Legacy numeric ids (1-6) mapped to seeded slugs for backward compatibility
+                const legacySlugMap = {
+                    '1': 'royal-gold-silk-sherwani',
+                    '2': 'emerald-velvet-indo-western',
+                    '3': 'ivory-cotton-silk-kurta',
+                    '4': 'maroon-jodhpuri-set',
+                    '5': 'navy-blue-bandhgala',
+                    '6': 'golden-jacquard-jacket',
+                };
+
                 const resolvedId = legacySlugMap[id] || id; // translate numeric placeholders to real slugs
 
                 const response = isObjectId(resolvedId)
@@ -80,8 +87,97 @@ const ProductDetail = () => {
 
     if (loading) {
         return (
-            <div className="min-h-[60vh] flex flex-col items-center justify-center text-white">
-                <h1 className="text-3xl font-bold mb-4">Loading...</h1>
+            <div className="mx-auto max-w-6xl px-4 py-8 lg:px-10">
+                {/* Breadcrumb Skeleton */}
+                <div className="flex items-center gap-2 text-sm mb-6">
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-4 w-6" />
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-6" />
+                    <Skeleton className="h-4 w-32" />
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                    {/* Product Images Skeleton */}
+                    <div className="flex flex-col gap-4">
+                        {/* Main Image Skeleton */}
+                        <Skeleton className="w-full rounded-xl aspect-4/5 md:aspect-3/4 lg:aspect-4/5 bg-[#2d3b30]" />
+
+                        {/* Thumbnail Images Skeleton */}
+                        <div className="grid grid-cols-4 gap-3">
+                            {[1, 2, 3, 4].map(idx => (
+                                <Skeleton key={idx} className="aspect-square rounded-lg bg-[#2d3b30]" />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Product Details Skeleton */}
+                    <div className="flex flex-col gap-6">
+                        {/* Breadcrumb Navigation Skeleton */}
+                        <Skeleton className="h-4 w-48 bg-[#2d3b30]" />
+
+                        {/* Title Skeleton */}
+                        <div className="space-y-3">
+                            <Skeleton className="h-8 w-full bg-[#2d3b30]" />
+                            <Skeleton className="h-6 w-2/3 bg-[#2d3b30]" />
+                        </div>
+
+                        {/* Rating and Reviews Skeleton */}
+                        <div className="flex items-center gap-2">
+                            <Skeleton className="h-4 w-24 bg-[#2d3b30]" />
+                            <Skeleton className="h-4 w-16 bg-[#2d3b30]" />
+                        </div>
+
+                        {/* Price Skeleton */}
+                        <div className="flex items-baseline gap-3">
+                            <Skeleton className="h-8 w-32 bg-[#2d3b30]" />
+                            <Skeleton className="h-6 w-24 bg-[#2d3b30]" />
+                        </div>
+
+                        {/* Description Skeleton */}
+                        <div className="space-y-2">
+                            <Skeleton className="h-4 w-full bg-[#2d3b30]" />
+                            <Skeleton className="h-4 w-5/6 bg-[#2d3b30]" />
+                            <Skeleton className="h-4 w-4/5 bg-[#2d3b30]" />
+                        </div>
+
+                        {/* Size Selection Skeleton */}
+                        <div className="space-y-3">
+                            <Skeleton className="h-4 w-20 bg-[#2d3b30]" />
+                            <div className="flex flex-wrap gap-2">
+                                {[1, 2, 3, 4].map(idx => (
+                                    <Skeleton key={idx} className="h-10 w-12 rounded-lg bg-[#2d3b30]" />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Color Selection Skeleton */}
+                        <div className="space-y-3">
+                            <Skeleton className="h-4 w-20 bg-[#2d3b30]" />
+                            <div className="flex flex-wrap gap-3">
+                                {[1, 2, 3, 4].map(idx => (
+                                    <Skeleton key={idx} className="h-8 w-8 rounded-full bg-[#2d3b30]" />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Quantity and Buttons Skeleton */}
+                        <div className="flex gap-4">
+                            <Skeleton className="h-12 w-24 rounded-lg bg-[#2d3b30]" />
+                            <Skeleton className="flex-1 h-12 rounded-lg bg-[#2d3b30]" />
+                        </div>
+
+                        {/* Features Skeleton */}
+                        <div className="space-y-3 pt-4">
+                            {[1, 2, 3].map(idx => (
+                                <div key={idx} className="flex items-center gap-3">
+                                    <Skeleton className="h-5 w-5 rounded bg-[#2d3b30]" />
+                                    <Skeleton className="h-4 w-32 bg-[#2d3b30]" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -160,7 +256,7 @@ const ProductDetail = () => {
 
     const handleAddToCart = async () => {
         if (!selectedVariant) {
-            alert('Please select both size and color');
+            showError('Please select both size and color');
             return;
         }
 
@@ -184,7 +280,7 @@ const ProductDetail = () => {
             });
             
             // Show success message
-            alert(`${quantity} item(s) added to cart!`);
+            showSuccess(`${quantity} item(s) added to cart!`);
             
             // Reset form
             setQuantity(1);
@@ -197,7 +293,7 @@ const ProductDetail = () => {
                 navigate('/cart');
             }, 500);
         } catch (error) {
-            alert(error?.response?.data?.message || 'Failed to add to cart. Please try again.');
+            showError(error?.response?.data?.message || 'Failed to add to cart. Please try again.');
         }
     };
 
@@ -216,7 +312,7 @@ const ProductDetail = () => {
                 {/* Product Images */}
                 <div className="flex flex-col gap-4">
                     {/* Main Image */}
-                    <div className="relative w-full rounded-xl overflow-hidden bg-surface-dark border border-[#28392e] min-h-[320px] aspect-[4/5] md:aspect-[3/4] lg:aspect-[4/5]">
+                    <div className="relative w-full rounded-xl overflow-hidden bg-surface-dark border border-[#28392e] min-h-80 aspect-4/5 md:aspect-3/4 lg:aspect-4/5">
                         {mainImages[selectedImage]?.url ? (
                             <img
                                 src={mainImages[selectedImage].url}

@@ -78,7 +78,7 @@ export const useLogout = () => {
       // Navigate to login
       navigate('/login');
     },
-    onError: (error) => {
+    onError: () => {
       // Clear cache anyway
       queryClient.clear();
       navigate('/login');

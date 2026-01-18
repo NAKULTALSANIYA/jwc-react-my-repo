@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Truck, Package, CheckCircle, Clock, AlertCircle, Save } from 'lucide-react';
 import { adminApi } from '../api/admin';
 import Loader from '../components/Loader';
+import { useToast } from '../components/Toast';
 
 const formatCurrency = (value = 0) => `₹${Number(value || 0).toLocaleString('en-IN', {
     maximumFractionDigits: 2,
@@ -93,6 +94,7 @@ const OrderDetail = () => {
     const [updating, setUpdating] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState('');
     const [statusNote, setStatusNote] = useState('');
+    const { success: showSuccess, error: showError } = useToast();
 
     useEffect(() => {
         loadOrderDetails();
@@ -107,7 +109,9 @@ const OrderDetail = () => {
             setOrder(loadedOrder);
             setSelectedStatus(loadedOrder?.status || 'pending');
         } catch (err) {
-            setError(err.message || 'Failed to load order details');
+            const errorMessage = err.message || 'Failed to load order details';
+            setError(errorMessage);
+            showError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -115,7 +119,7 @@ const OrderDetail = () => {
 
     const handleStatusUpdate = async () => {
         if (!selectedStatus || selectedStatus === order?.status) {
-            alert('Please select a different status');
+            showError('Please select a different status');
             return;
         }
 
@@ -128,9 +132,11 @@ const OrderDetail = () => {
             
             setOrder(response?.order || response);
             setStatusNote('');
-            alert('Order status updated successfully!');
+            showSuccess('Order status updated successfully!');
         } catch (err) {
-            setError(err.message || 'Failed to update order status');
+            const errorMessage = err.message || 'Failed to update order status';
+            setError(errorMessage);
+            showError(errorMessage);
         } finally {
             setUpdating(false);
         }

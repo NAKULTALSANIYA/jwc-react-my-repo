@@ -4,12 +4,14 @@ import {
     Plus,
     Search,
     Filter,
-    Edit,
+    Pencil,
     Trash2,
     AlertTriangle
 } from 'lucide-react';
 import { adminApi } from '../api/admin';
 import Loader from '../components/Loader';
+import { SkeletonTableRow } from '../components/Skeleton';
+import { useToast } from '../components/Toast';
 
 const formatCurrency = (value = 0) => `₹${Number(value || 0).toLocaleString('en-IN', {
     maximumFractionDigits: 0,
@@ -43,6 +45,8 @@ const Products = () => {
     const [error, setError] = useState('');
     const [deleteConfirm, setDeleteConfirm] = useState(null);
     const [deleting, setDeleting] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const { success: showSuccess, error: showError } = useToast();
 
     useEffect(() => {
         loadProducts();
@@ -55,7 +59,9 @@ const Products = () => {
             const data = await adminApi.products({ limit: 50, sort: 'createdAt', order: 'desc' });
             setProducts(data?.products || data || []);
         } catch (err) {
-            setError(err.message || 'Unable to load products');
+            const errorMessage = err.message || 'Unable to load products';
+            setError(errorMessage);
+            showError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -69,12 +75,20 @@ const Products = () => {
             await adminApi.deleteProduct(deleteConfirm._id || deleteConfirm.id);
             setProducts(prev => prev.filter(p => (p._id || p.id) !== (deleteConfirm._id || deleteConfirm.id)));
             setDeleteConfirm(null);
+            showSuccess('Product deleted successfully');
         } catch (err) {
-            alert(err.message || 'Failed to delete product');
+            showError(err.message || 'Failed to delete product');
         } finally {
             setDeleting(false);
         }
     };
+
+    const filteredProducts = products.filter(product =>
+        product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.category?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.category?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (product._id || product.id)?.toString().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className="space-y-8">
@@ -99,6 +113,8 @@ const Products = () => {
                         <input
                             type="text"
                             placeholder="Search products..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                             className="bg-transparent border-none outline-none text-sm w-full"
                         />
                     </div>
@@ -124,11 +140,11 @@ const Products = () => {
                         </thead>
                         <tbody className="divide-y divide-slate-50">
                             {loading && (
-                                <tr>
-                                    <td className="px-6 py-4" colSpan={6}>
-                                        <Loader label="Loading products" />
-                                    </td>
-                                </tr>
+                                <>
+                                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                                        <SkeletonTableRow key={i} columns={6} />
+                                    ))}
+                                </>
                             )}
                             {error && !loading && (
                                 <tr>
@@ -140,7 +156,7 @@ const Products = () => {
                                     <td className="px-6 py-4 text-sm text-slate-500" colSpan={6}>No products found.</td>
                                 </tr>
                             )}
-                            {products.map((product) => {
+                            {filteredProducts.map((product) => {
                                 const stock = deriveStock(product);
                                 const status = getStatus(product);
                                 const price = derivePrice(product);
@@ -183,20 +199,22 @@ const Products = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className="flex items-center gap-3 justify-end">
                                                 <button 
                                                     onClick={() => navigate(`/products/edit/${productId}`)}
-                                                    className="p-2 hover:bg-blue-50 text-blue-600 rounded-lg transition-colors"
+                                                    className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 font-medium text-sm"
                                                     title="Edit product"
                                                 >
-                                                    <Edit size={18} />
+                                                    <Pencil size={16} />
+                                                    Edit
                                                 </button>
                                                 <button 
                                                     onClick={() => setDeleteConfirm(product)}
-                                                    className="p-2 hover:bg-rose-50 text-rose-600 rounded-lg transition-colors"
+                                                    className="inline-flex items-center gap-2 px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg transition-all duration-200 shadow-md hover:shadow-lg hover:scale-105 font-medium text-sm"
                                                     title="Delete product"
                                                 >
-                                                    <Trash2 size={18} />
+                                                    <Trash2 size={16} />
+                                                    Delete
                                                 </button>
                                             </div>
                                         </td>
@@ -208,7 +226,7 @@ const Products = () => {
                 </div>
 
                 <div className="p-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500">
-                    <p>Showing {products.length ? 1 : 0} to {products.length} of {products.length} results</p>
+                    <p>Showing {filteredProducts.length ? 1 : 0} to {filteredProducts.length} of {products.length} results</p>
                     <div className="flex items-center gap-2">
                         <button className="px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50" disabled>Previous</button>
                         <button className="px-3 py-1.5 border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-50" disabled>Next</button>
@@ -218,7 +236,7 @@ const Products = () => {
 
             {/* Delete Confirmation Modal */}
             {deleteConfirm && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
                         <div className="flex items-center gap-4 mb-4">
                             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">

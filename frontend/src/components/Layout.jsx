@@ -15,7 +15,7 @@ const Header = () => {
     return (
         <>
             <header className="sticky top-0 z-50 w-full border-b border-[#28392e] bg-background-dark/95 backdrop-blur-sm px-4 lg:px-10 py-3">
-                <div className="flex items-center justify-between mx-auto max-w-[1400px]">
+                <div className="flex items-center justify-between mx-auto max-w-350">
                     <div className="flex items-center gap-4 lg:gap-8">
                         {/* Logo */}
                         <Link to="/" className="flex items-center gap-3 text-secondary">
@@ -70,7 +70,7 @@ const Header = () => {
             {mobileMenuOpen && (
                 <div className="lg:hidden fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
                     <div
-                        className="absolute right-0 top-0 h-full w-[280px] bg-background-dark border-l border-[#28392e] shadow-2xl"
+                        className="absolute right-0 top-0 h-full w-70 bg-background-dark border-l border-[#28392e] shadow-2xl"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex flex-col h-full">
@@ -169,10 +169,6 @@ const Footer = () => {
 
                 <div className="border-t border-[#28392e] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
                     <p className="text-white/30 text-xs font-body">© {new Date().getFullYear()} Jalaram Wedding Couture. All rights reserved.</p>
-                    <div className="flex gap-4">
-                        <a href="#" className="text-white/40 hover:text-white transition-colors"><Share className="text-xl" /></a>
-                        <a href="#" className="text-white/40 hover:text-white transition-colors"><ThumbsUp className="text-xl" /></a>
-                    </div>
                 </div>
             </div>
         </footer>
@@ -222,7 +218,7 @@ const Layout = () => {
             style={{ backgroundColor: '#102216', minHeight: '100vh' }}
         >
             <Header />
-            <main className="flex-grow">
+            <main className="grow">
                 <Outlet />
             </main>
             <WhatsAppButton />

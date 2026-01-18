@@ -33,7 +33,7 @@ export const removeFromCart = async (variantId) => {
 
 // Clear entire cart
 export const clearCart = async () => {
-  const response = await axiosInstance.delete('/cart');
+  const response = await axiosInstance.delete('/cart/clear');
   return response.data;
 };
 

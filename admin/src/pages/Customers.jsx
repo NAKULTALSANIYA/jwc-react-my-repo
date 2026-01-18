@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 import { adminApi } from '../api/admin';
 import Loader from '../components/Loader';
+import { SkeletonCustomerCard } from '../components/Skeleton';
+import { useToast } from '../components/Toast';
 
 const formatCurrency = (value = 0) => `₹${Number(value || 0).toLocaleString('en-IN', {
     maximumFractionDigits: 0,
@@ -18,6 +20,9 @@ const Customers = () => {
     const [customers, setCustomers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const { error: showError } = useToast();
 
     useEffect(() => {
         let active = true;
@@ -30,7 +35,12 @@ const Customers = () => {
                 if (!active) return;
                 setCustomers(data?.users || data || []);
             } catch (err) {
-                if (active) setError(err.message || 'Unable to load customers');
+                if (active) {
+                    const errorMessage = err.message || 'Unable to load customers';
+                    setError(errorMessage);
+                    // Show toast after state update
+                    setTimeout(() => showError(errorMessage), 0);
+                }
             } finally {
                 if (active) setLoading(false);
             }
@@ -41,7 +51,29 @@ const Customers = () => {
         return () => {
             active = false;
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const filteredCustomers = customers.filter(customer => {
+        const searchLower = searchTerm.toLowerCase();
+        const fullName = (customer.name || customer.fullName || '').toLowerCase();
+        const email = (customer.email || '').toLowerCase();
+        const phone = (customer.phone || customer.mobile || '').toLowerCase();
+
+        const matchesSearch = searchLower === '' ||
+            fullName.includes(searchLower) ||
+            email.includes(searchLower) ||
+            phone.includes(searchLower);
+
+        if (!matchesSearch) return false;
+
+        if (statusFilter !== 'all') {
+            const customerStatus = customer.isActive === false ? 'inactive' : 'active';
+            if (customerStatus !== statusFilter) return false;
+        }
+
+        return true;
+    });
 
     return (
         <div className="space-y-8">
@@ -57,24 +89,50 @@ const Customers = () => {
                         <input
                             type="text"
                             placeholder="Search customers..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                             className="bg-transparent border-none outline-none text-sm w-full"
                         />
                     </div>
-                    <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-slate-200">
-                        <Filter size={16} />
-                        Filter
-                    </button>
+                    <div className="relative group">
+                        <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-slate-200">
+                            <Filter size={16} />
+                            Filter
+                        </button>
+                        <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-lg shadow-lg z-40 hidden group-hover:block">
+                            <button 
+                                onClick={() => setStatusFilter('all')}
+                                className={`block w-full text-left px-4 py-2 text-sm ${statusFilter === 'all' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-700 hover:bg-slate-50'}`}
+                            >
+                                All Customers
+                            </button>
+                            <button 
+                                onClick={() => setStatusFilter('active')}
+                                className={`block w-full text-left px-4 py-2 text-sm border-t border-slate-100 ${statusFilter === 'active' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-700 hover:bg-slate-50'}`}
+                            >
+                                Active
+                            </button>
+                            <button 
+                                onClick={() => setStatusFilter('inactive')}
+                                className={`block w-full text-left px-4 py-2 text-sm border-t border-slate-100 ${statusFilter === 'inactive' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-700 hover:bg-slate-50'}`}
+                            >
+                                Inactive
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
                     {loading && (
-                        <div className="col-span-full">
-                            <Loader label="Loading customers" />
-                        </div>
+                        <>
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <SkeletonCustomerCard key={i} />
+                            ))}
+                        </>
                     )}
                     {error && !loading && <p className="text-sm text-rose-600">{error}</p>}
                     {!loading && !error && customers.length === 0 && <p className="text-sm text-slate-500">No customers found.</p>}
-                    {!loading && !error && customers.map((customer) => {
+                    {!loading && !error && filteredCustomers.map((customer) => {
                         const fullName = customer.name || customer.fullName || 'Unknown';
                         const initials = fullName.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
                         const status = customer.isActive === false ? 'Inactive' : 'Active';
@@ -90,7 +148,7 @@ const Customers = () => {
                                 </button>
 
                                 <div className="flex items-center gap-4 mb-4">
-                                    <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold">
+                                    <div className="w-14 h-14 bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold">
                                         {initials || 'CU'}
                                     </div>
                                     <div>

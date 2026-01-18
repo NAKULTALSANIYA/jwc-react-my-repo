@@ -221,7 +221,6 @@ export const useUpdateCartItem = () => {
 
   return useMutation({
     mutationFn: async (updatedItem) => {
-      const variantId = updatedItem.variantId;
       const productId = updatedItem.productId;
       const size = updatedItem.size;
       const color = updatedItem.color;
@@ -399,6 +398,13 @@ export const useClearCart = () => {
       // Clear cart cache and storage
       queryClient.setQueryData(queryKeys.cart.items, { items: [] });
       clearCartFromStorage();
+    },
+    onError: (error) => {
+      // Silently handle errors - clear cache anyway to prevent UI from showing stale cart
+      queryClient.setQueryData(queryKeys.cart.items, { items: [] });
+      clearCartFromStorage();
+      // Log error for debugging but don't throw
+      console.warn('Error clearing cart:', error);
     },
   });
 };

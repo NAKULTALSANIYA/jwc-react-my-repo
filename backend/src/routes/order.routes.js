@@ -6,6 +6,7 @@ import { isAdmin, isManager } from '../middlewares/role.js';
 const router = express.Router();
 
 // NEW PAYMENT FLOW: Create Razorpay order first, then verify and create DB order
+router.get('/shipping-cost', OrderController.getShippingCost);
 router.post('/payment/create-razorpay-order', authenticate, OrderController.createRazorpayOrder);
 router.post('/payment/verify-and-create', authenticate, OrderController.verifyPaymentAndCreateOrder);
 

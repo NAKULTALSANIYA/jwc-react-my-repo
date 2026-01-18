@@ -3,14 +3,21 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
 import { useUser } from '../hooks/useAuth';
 import { useCreateOrder } from '../hooks/useOrders';
+import { useToast } from '../components/Toast';
 import { createRazorpayOrder, verifyPaymentAndCreateOrder } from '../api/services/payment.service';
-import { Lock, ShoppingCart, AlertCircle, User, Truck, CreditCard, ArrowRight, ShieldCheck } from 'lucide-react';
+import { getShippingCost } from '../api/services/order.service';
+import { Lock, ShoppingCart, AlertCircle, User, Truck, CreditCard, ArrowRight, ShieldCheck, Check } from 'lucide-react';
+
+const Skeleton = ({ className }) => (
+    <div className={`bg-[#1f2a22] rounded-md animate-pulse ${className}`} />
+);
 
 const Checkout = () => {
     const { data: user, isLoading: userLoading } = useUser();
     const { data: cartData, isLoading: cartLoading } = useCart();
     const createOrderMutation = useCreateOrder();
     const navigate = useNavigate();
+    const { error: showError } = useToast();
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -25,6 +32,10 @@ const Checkout = () => {
     });
 
     const [errors, setErrors] = useState({});
+    const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [shippingCost, setShippingCost] = useState(0);
+    const [setShippingLoading] = useState(true);
 
     const items = cartData?.items || [];
 
@@ -48,9 +59,25 @@ const Checkout = () => {
     };
 
     const cartTotal = items.reduce((acc, item) => acc + (getUnitPrice(item) * item.quantity), 0);
-    const shipping = 0;
+    const shipping = shippingCost;
     const tax = Math.round(cartTotal * 0.18);
     const total = cartTotal + shipping + tax;
+
+    // Fetch shipping cost from backend on mount
+    useEffect(() => {
+        const fetchShipping = async () => {
+            try {
+                const response = await getShippingCost();
+                setShippingCost(response.data.shipping || 80);
+            } catch (err) {
+                console.error('Failed to fetch shipping cost:', err);
+                setShippingCost(80); // Fallback to 80 if API fails
+            } finally {
+                setShippingLoading(false);
+            }
+        };
+        fetchShipping();
+    }, []);
 
     // Prefill form with logged-in user details when available
     useEffect(() => {
@@ -114,11 +141,17 @@ const Checkout = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
+        // Prevent multiple submissions
+        if (isSubmitting) return;
+        
         // Validate form before submission
         if (!validateForm()) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
+
+        // Set submitting state immediately to disable button
+        setIsSubmitting(true);
 
         const orderData = {
             shippingAddress: {
@@ -158,10 +191,17 @@ const Checkout = () => {
             const razorpayResponse = await createRazorpayOrder(orderData);
             const razorpayOrder = razorpayResponse?.data?.razorpayOrder;
             const keyId = razorpayResponse?.data?.keyId || import.meta.env.VITE_RAZORPAY_KEY_ID;
+            const backendShipping = razorpayResponse?.data?.shipping || 80;
 
             if (!razorpayOrder || !razorpayOrder.id) {
                 throw new Error('Failed to create payment order');
             }
+
+            // Update shipping cost from backend
+            setShippingCost(backendShipping);
+
+            // Recalculate total with backend shipping
+            const finalTotal = cartTotal + backendShipping + tax;
 
             // Step 2: Load and open Razorpay payment modal
             await loadRazorpay();
@@ -183,13 +223,24 @@ const Checkout = () => {
                 },
                 handler: async (response) => {
                     try {
+                        // Show loading skeleton immediately
+                        setIsProcessingPayment(true);
+                        
                         // Step 3: Payment successful - verify and create order
                         // Only after successful payment, create the DB order
                         const verifyResponse = await verifyPaymentAndCreateOrder({
                             razorpayOrderId: response.razorpay_order_id,
                             razorpayPaymentId: response.razorpay_payment_id,
                             razorpaySignature: response.razorpay_signature,
-                            orderData, // Send original order data for order creation
+                            orderData: {
+                                ...orderData,
+                                totals: {
+                                    subtotal: cartTotal,
+                                    tax,
+                                    shipping: backendShipping,
+                                    total: finalTotal,
+                                },
+                            },
                         });
 
                         const createdOrder = verifyResponse?.data?.order;
@@ -200,14 +251,17 @@ const Checkout = () => {
                         // Navigate to order success page
                         navigate(`/order/${createdOrder._id}/success`);
                     } catch (err) {
+                        setIsProcessingPayment(false);
+                        setIsSubmitting(false);
                         const message = err?.response?.data?.message || err.message || 'Payment verification failed. Please contact support.';
-                        alert(message);
+                        showError(message);
                         // Order was NOT created, so user can retry
                     }
                 },
                 modal: {
                     ondismiss: () => {
-                        alert('Payment cancelled. Your order was not created. Please try again.');
+                        setIsSubmitting(false);
+                        showError('Payment cancelled. Your order was not created. Please try again.');
                     },
                 },
                 theme: {
@@ -217,6 +271,7 @@ const Checkout = () => {
 
             rzp.open();
         } catch (err) {
+            setIsSubmitting(false);
             const errorMessage = err?.response?.data?.message || err.message || 'Checkout failed. Please try again.';
             
             // Check if it's a validation error from backend
@@ -230,15 +285,55 @@ const Checkout = () => {
                 setErrors(backendErrors);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
-                alert(errorMessage);
+                showError(errorMessage);
             }
         }
     };
 
+    // Show payment processing skeleton
+    if (isProcessingPayment) {
+        return (
+            <div className="min-h-screen flex items-center justify-center px-4">
+                <div className="w-full max-w-md text-center">
+                    {/* Processing Icon */}
+                    <div className="mb-6 flex justify-center">
+                        <div className="w-24 h-24 rounded-full bg-linear-to-br from-primary/30 to-primary/10 border-2 border-primary/50 flex items-center justify-center animate-pulse">
+                            <Check className="text-primary w-12 h-12" />
+                        </div>
+                    </div>
+
+                    {/* Heading */}
+                    <h2 className="text-white text-2xl font-bold mb-2">Processing Payment</h2>
+                    <p className="text-[#9db9a6] mb-8">Please wait while we verify your payment and create your order...</p>
+
+                    {/* Progress Skeleton */}
+                    <div className="space-y-4">
+                        <div className="bg-surface-dark rounded-lg p-4 border border-[#28392e]">
+                            <div className="flex items-center gap-3 mb-3">
+                                <Skeleton className="w-5 h-5 rounded-full" />
+                                <Skeleton className="h-4 w-32" />
+                            </div>
+                            <div className="flex items-center gap-3 mb-3">
+                                <Skeleton className="w-5 h-5 rounded-full" />
+                                <Skeleton className="h-4 w-40" />
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <Skeleton className="w-5 h-5 rounded-full" />
+                                <Skeleton className="h-4 w-36" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <p className="text-[#9db9a6] text-sm mt-6">Do not close this page</p>
+                </div>
+            </div>
+        );
+    }
+
     // Show loading state
     if (userLoading || cartLoading) {
         return (
-            <div className="mx-auto max-w-[1200px] px-4 py-8 lg:px-0">
+            <div className="mx-auto max-w-300 px-4 py-8 lg:px-0">
                 <div className="flex items-center justify-center py-20">
                     <div className="text-white/50 text-lg">Loading checkout...</div>
                 </div>
@@ -249,7 +344,7 @@ const Checkout = () => {
     // Show login prompt if user is not authenticated
     if (!user) {
         return (
-            <div className="mx-auto max-w-[1200px] px-4 py-8 lg:px-0">
+            <div className="mx-auto max-w-300 px-4 py-8 lg:px-0">
                 <div className="flex flex-col items-center justify-center py-20 gap-6">
                     <div className="text-center max-w-md">
                         <Lock className="text-secondary w-16 h-16 mb-4 mx-auto" />
@@ -258,7 +353,7 @@ const Checkout = () => {
                         <div className="flex gap-4 justify-center">
                             <Link 
                                 to="/login" 
-                                className="px-6 py-3 bg-gradient-to-r from-secondary to-[#c49e50] hover:from-[#e3c578] hover:to-[#c49e50] text-[#0f1c15] font-bold rounded-lg transition-all"
+                                className="px-6 py-3 bg-linear-to-r from-secondary to-[#c49e50] hover:from-[#e3c578] hover:to-[#c49e50] text-[#0f1c15] font-bold rounded-lg transition-all"
                             >
                                 Login
                             </Link>
@@ -278,7 +373,7 @@ const Checkout = () => {
     // Show empty cart message
     if (items.length === 0) {
         return (
-            <div className="mx-auto max-w-[1200px] px-4 py-8 lg:px-0">
+            <div className="mx-auto max-w-300 px-4 py-8 lg:px-0">
                 <div className="flex flex-col items-center justify-center py-20 gap-6">
                     <div className="text-center max-w-md">
                         <ShoppingCart className="text-secondary w-16 h-16 mb-4 mx-auto" />
@@ -286,7 +381,7 @@ const Checkout = () => {
                         <p className="text-white/60 mb-6">Add some items to your cart before checking out.</p>
                         <Link 
                             to="/products" 
-                            className="inline-block px-6 py-3 bg-gradient-to-r from-secondary to-[#c49e50] hover:from-[#e3c578] hover:to-[#c49e50] text-[#0f1c15] font-bold rounded-lg transition-all"
+                            className="inline-block px-6 py-3 bg-linear-to-r from-secondary to-[#c49e50] hover:from-[#e3c578] hover:to-[#c49e50] text-[#0f1c15] font-bold rounded-lg transition-all"
                         >
                             Continue Shopping
                         </Link>
@@ -297,7 +392,7 @@ const Checkout = () => {
     }
 
     return (
-        <div className="mx-auto max-w-[1200px] px-4 py-8 lg:px-0">
+        <div className="mx-auto max-w-300 px-4 py-8 lg:px-0">
             {/* Page Heading */}
             <div className="mb-8">
                 <h1 className="text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em] mb-2 font-display">Checkout</h1>
@@ -432,7 +527,9 @@ const Checkout = () => {
                                     <div>
                                         <label className="text-white text-sm font-medium mb-2 block">PIN Code *</label>
                                         <input
-                                            type="text"
+                                            type="tel"
+                                            maxLength={6}
+                                            minLength={6}
                                             name="pincode"
                                             value={formData.pincode}
                                             onChange={handleInputChange}
@@ -457,7 +554,7 @@ const Checkout = () => {
                                 </p>
                                 <div className="flex items-center gap-3 mt-2">
                                     <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Razorpay_logo.svg" alt="Razorpay" className="h-6 bg-white rounded px-2 py-1" />
-                                    <span className="text-xs text-white/60">PCI-DSS compliant • 256-bit SSL</span>
+                                    {/* <span className="text-xs text-white/60">PCI-DSS compliant • 256-bit SSL</span> */}
                                 </div>
                             </div>
                         </div>
@@ -465,12 +562,12 @@ const Checkout = () => {
                 </div>
 
                 {/* Order Summary */}
-                <div className="w-full lg:w-[380px] shrink-0 lg:sticky lg:top-24">
+                <div className="w-full lg:w-95 shrink-0 lg:sticky lg:top-24">
                     <div className="flex flex-col gap-6 rounded-xl border border-solid border-[#3b5443] bg-surface-dark p-6 shadow-xl">
                         <h2 className="text-white text-xl font-bold leading-tight font-display pb-4 border-b border-[#28392e]">Order Summary</h2>
 
                         {/* Cart Items */}
-                        <div className="flex flex-col gap-3 pb-4 border-b border-[#28392e] max-h-[300px] overflow-y-auto">
+                        <div className="flex flex-col gap-3 pb-4 border-b border-[#28392e] max-h-75 overflow-y-auto">
                             {items.map((item, idx) => (
                                 <div key={`${item.product?._id || 'product'}-${item.variantId || 'variant'}-${idx}`} className="flex gap-3">
                                     <div className="w-16 h-20 rounded bg-[#28392e] overflow-hidden shrink-0">
@@ -497,12 +594,18 @@ const Checkout = () => {
                             </div>
                             <div className="flex justify-between text-white/70 text-sm">
                                 <span>Shipping</span>
-                                <span className="text-primary">Free</span>
+                                <span className="text-white">
+                                    {shippingCost === 0 ? (
+                                        <span className="text-primary">Free</span>
+                                    ) : (
+                                        `₹${shippingCost.toLocaleString()}`
+                                    )}
+                                </span>
                             </div>
-                            {/* <div className="flex justify-between text-white/70 text-sm">
-                                <span>Tax (18% GST)</span>
+                            <div className="flex justify-between text-white/70 text-sm">
+                                <span>Taxs & Charges</span>
                                 <span className="text-white">₹{tax.toLocaleString()}</span>
-                            </div> */}
+                            </div>
                         </div>
 
                         {/* Total */}
@@ -518,12 +621,12 @@ const Checkout = () => {
                         <button
                             type="button"
                             onClick={handleSubmit}
-                            disabled={createOrderMutation.isPending}
-                            className="group relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-secondary to-[#c49e50] hover:from-[#e3c578] hover:to-[#c49e50] py-4 text-[#0f1c15] shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={createOrderMutation.isPending || isSubmitting}
+                            className="group relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-linear-to-r from-secondary to-[#c49e50] hover:from-[#e3c578] hover:to-[#c49e50] py-4 text-[#0f1c15] shadow-lg transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <span className="relative z-10 text-base font-bold uppercase tracking-widest flex items-center gap-2">
-                                {createOrderMutation.isPending ? 'Processing...' : 'Place Order'}
-                                {!createOrderMutation.isPending && (
+                                {createOrderMutation.isPending || isSubmitting ? 'Processing...' : 'Place Order'}
+                                {!createOrderMutation.isPending && !isSubmitting && (
                                     <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
                                 )}
                             </span>

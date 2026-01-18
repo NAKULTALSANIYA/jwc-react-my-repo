@@ -5,6 +5,21 @@ import ApiError from '../utils/ApiError.js';
 import { emitOrderCreated } from '../utils/socket.js';
 
 class OrderController {
+  /**
+   * Get shipping cost
+   * Returns the shipping cost for orders
+   */
+  async getShippingCost(req, res, next) {
+    try {
+      // You can make this dynamic based on cart value, location, etc.
+      const shipping = 80;
+      
+      return ApiResponse.success(res, 'Shipping cost retrieved successfully', { shipping });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async createOrder(req, res, next) {
     try {
       const userId = req.user.id;
@@ -217,6 +232,9 @@ class OrderController {
         throw new ApiError(400, 'Order total is required');
       }
 
+      // Define shipping cost (can be made dynamic based on cart value, location, etc.)
+      const shipping = 80;
+
       // Create receipt for Razorpay (unique identifier)
       const timestamp = Date.now().toString().slice(-6);
       const receipt = `RECEIPT_${timestamp}`;
@@ -239,6 +257,7 @@ class OrderController {
         },
         // Include necessary info for frontend to complete the payment flow
         keyId: process.env.RAZORPAY_KEY_ID,
+        shipping, // Send dynamic shipping cost to frontend
       });
     } catch (error) {
       next(error);

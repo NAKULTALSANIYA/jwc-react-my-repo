@@ -12,6 +12,8 @@ import { getAdminSocket } from '../api/socket';
 import Loader from '../components/Loader';
 import { useAuth } from '../hooks/useAuth';
 import * as XLSX from 'xlsx';
+import { SkeletonTableRow } from '../components/Skeleton';
+import { useToast } from '../components/Toast';
 
 const formatCurrency = (value = 0) => `₹${Number(value || 0).toLocaleString('en-IN', {
     maximumFractionDigits: 0,
@@ -32,6 +34,11 @@ const Orders = () => {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [dateRange, setDateRange] = useState({ start: '', end: '' });
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const { success: showSuccess, error: showError } = useToast();
 
     const exportOrders = () => {
         try {
@@ -71,7 +78,9 @@ const Orders = () => {
                 setOrders(data?.orders || data || []);
             } catch (err) {
                 if (active) {
-                    setError(err.message || 'Unable to load orders');
+                    const errorMessage = err.message || 'Unable to load orders';
+                    setError(errorMessage);
+                    showError(errorMessage);
                 }
             } finally {
                 if (active) setLoading(false);
@@ -126,6 +135,45 @@ const Orders = () => {
         };
     }, [token]);
 
+    const filteredOrders = orders.filter(order => {
+        // Search filter
+        const searchLower = searchTerm.toLowerCase();
+        const orderId = (order._id || order.id || '').toString();
+        const orderNumber = (order.orderNumber || '').toString();
+        const customerName = (order.user?.name || 'Guest user').toLowerCase();
+        const customerEmail = (order.user?.email || '').toLowerCase();
+
+        const matchesSearch = searchLower === '' || 
+            orderId.includes(searchLower) || 
+            orderNumber.includes(searchLower) || 
+            customerName.includes(searchLower) ||
+            customerEmail.includes(searchLower);
+
+        if (!matchesSearch) return false;
+
+        // Status filter
+        if (statusFilter !== 'all' && order.status !== statusFilter) {
+            return false;
+        }
+
+        // Date range filter
+        if (dateRange.start || dateRange.end) {
+            const orderDate = new Date(order.createdAt || order.created_at);
+            if (dateRange.start) {
+                const startDate = new Date(dateRange.start);
+                startDate.setHours(0, 0, 0, 0);
+                if (orderDate < startDate) return false;
+            }
+            if (dateRange.end) {
+                const endDate = new Date(dateRange.end);
+                endDate.setHours(23, 59, 59, 999);
+                if (orderDate > endDate) return false;
+            }
+        }
+
+        return true;
+    });
+
     return (
         <div className="space-y-8">
             <div className="flex justify-between items-end">
@@ -152,18 +200,111 @@ const Orders = () => {
                         <input
                             type="text"
                             placeholder="Search by Order ID or Customer..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                             className="bg-transparent border-none outline-none text-sm w-full"
                         />
                     </div>
                     <div className="flex gap-2">
-                        <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-slate-200">
-                            <Filter size={16} />
-                            Status
-                        </button>
-                        <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-slate-200">
-                            <Clock size={16} />
-                            Date Range
-                        </button>
+                        <div className="relative">
+                            <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-slate-200">
+                                <Filter size={16} />
+                                Status
+                            </button>
+                            <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-lg shadow-lg z-40 hidden group-hover:block">
+                                <button 
+                                    onClick={() => setStatusFilter('all')}
+                                    className={`block w-full text-left px-4 py-2 text-sm ${statusFilter === 'all' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-700 hover:bg-slate-50'}`}
+                                >
+                                    All Orders
+                                </button>
+                                <button 
+                                    onClick={() => setStatusFilter('pending')}
+                                    className={`block w-full text-left px-4 py-2 text-sm border-t border-slate-100 ${statusFilter === 'pending' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-700 hover:bg-slate-50'}`}
+                                >
+                                    Pending
+                                </button>
+                                <button 
+                                    onClick={() => setStatusFilter('confirmed')}
+                                    className={`block w-full text-left px-4 py-2 text-sm border-t border-slate-100 ${statusFilter === 'confirmed' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-700 hover:bg-slate-50'}`}
+                                >
+                                    Confirmed
+                                </button>
+                                <button 
+                                    onClick={() => setStatusFilter('processing')}
+                                    className={`block w-full text-left px-4 py-2 text-sm border-t border-slate-100 ${statusFilter === 'processing' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-700 hover:bg-slate-50'}`}
+                                >
+                                    Processing
+                                </button>
+                                <button 
+                                    onClick={() => setStatusFilter('shipped')}
+                                    className={`block w-full text-left px-4 py-2 text-sm border-t border-slate-100 ${statusFilter === 'shipped' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-700 hover:bg-slate-50'}`}
+                                >
+                                    Shipped
+                                </button>
+                                <button 
+                                    onClick={() => setStatusFilter('delivered')}
+                                    className={`block w-full text-left px-4 py-2 text-sm border-t border-slate-100 ${statusFilter === 'delivered' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-700 hover:bg-slate-50'}`}
+                                >
+                                    Delivered
+                                </button>
+                                <button 
+                                    onClick={() => setStatusFilter('cancelled')}
+                                    className={`block w-full text-left px-4 py-2 text-sm border-t border-slate-100 ${statusFilter === 'cancelled' ? 'bg-blue-50 text-blue-600 font-medium' : 'text-slate-700 hover:bg-slate-50'}`}
+                                >
+                                    Cancelled
+                                </button>
+                            </div>
+                        </div>
+                        <div className="relative">
+                            <button 
+                                onClick={() => setShowDatePicker(!showDatePicker)}
+                                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-slate-200">
+                                <Clock size={16} />
+                                Date Range
+                            </button>
+                            {showDatePicker && (
+                                <div className="absolute right-0 mt-2 bg-white border border-slate-200 rounded-lg shadow-lg p-4 z-40 w-72">
+                                    <div className="space-y-3">
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-600 mb-1">Start Date</label>
+                                            <input
+                                                type="date"
+                                                value={dateRange.start}
+                                                onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+                                                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-600 mb-1">End Date</label>
+                                            <input
+                                                type="date"
+                                                value={dateRange.end}
+                                                onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+                                                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+                                            />
+                                        </div>
+                                        <div className="flex gap-2 pt-2">
+                                            <button
+                                                onClick={() => {
+                                                    setDateRange({ start: '', end: '' });
+                                                    setShowDatePicker(false);
+                                                }}
+                                                className="flex-1 px-3 py-1.5 text-sm text-slate-600 border border-slate-200 rounded hover:bg-slate-50"
+                                            >
+                                                Reset
+                                            </button>
+                                            <button
+                                                onClick={() => setShowDatePicker(false)}
+                                                className="flex-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+                                            >
+                                                Apply
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -182,11 +323,11 @@ const Orders = () => {
                         </thead>
                         <tbody className="divide-y divide-slate-50">
                             {loading && (
-                                <tr>
-                                    <td className="px-6 py-4" colSpan={7}>
-                                        <Loader label="Loading orders" />
-                                    </td>
-                                </tr>
+                                <>
+                                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                                        <SkeletonTableRow key={i} columns={7} />
+                                    ))}
+                                </>
                             )}
                             {error && !loading && (
                                 <tr>
@@ -198,7 +339,7 @@ const Orders = () => {
                                     <td className="px-6 py-4 text-sm text-slate-500" colSpan={7}>No orders found.</td>
                                 </tr>
                             )}
-                            {orders.map((order) => {
+                            {filteredOrders.map((order) => {
                                 const orderId = order._id || order.id; // Use MongoDB ID for routing
                                 const orderNumber = order.orderNumber || order._id || order.id; // Display order number
                                 const customer = order.user?.name || 'Guest user';

@@ -202,7 +202,9 @@ class CartService {
     try {
       const cart = await CartDAO.findByUserId(userId);
       if (!cart || cart.items.length === 0) {
-        throw new ApiError(404, 'Cart is already empty');
+        // Cart is already empty, just return empty cart (don't throw error)
+        logger.info(`Cart already empty for user ${userId}`);
+        return { user: userId, items: [] };
       }
 
       const updatedCart = await CartDAO.clearCart(userId);

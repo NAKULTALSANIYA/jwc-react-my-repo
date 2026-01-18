@@ -5,6 +5,12 @@ import axiosInstance from '../axios';
  * Handles all order-related API calls
  */
 
+// Get shipping cost
+export const getShippingCost = async () => {
+  const response = await axiosInstance.get('/orders/shipping-cost');
+  return response.data;
+};
+
 // Get all orders for logged-in user
 export const getOrders = async (params = {}) => {
   const response = await axiosInstance.get('/orders/my-orders', { params });

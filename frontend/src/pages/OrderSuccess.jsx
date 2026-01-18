@@ -1,11 +1,17 @@
 import React, { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useOrder } from '../hooks/useOrders';
+import { useClearCart } from '../hooks/useCart';
 import { CheckCircle, Info, Mail } from 'lucide-react';
+
+const Skeleton = ({ className }) => (
+    <div className={`bg-[#1f2a22] rounded-md animate-pulse ${className}`} />
+);
 
 const OrderSuccess = () => {
     const { orderId } = useParams();
     const { data: orderData, isLoading } = useOrder(orderId);
+    const clearCartMutation = useClearCart();
     const order = orderData?.order;
 
     const getOrderStatusClasses = (status) => {
@@ -54,27 +60,101 @@ const OrderSuccess = () => {
     };
 
     useEffect(() => {
-        // Clear any stored cart data on success
-        localStorage.removeItem('jwc_cart_data');
-    }, []);
+        // Clear the cart (both authenticated and guest)
+        // The useClearCart hook handles both cases internally
+        clearCartMutation.mutate();
+    }, [clearCartMutation]);
 
     if (isLoading) {
         return (
-            <div className="mx-auto max-w-[1200px] px-4 py-8 lg:px-0">
-                <div className="flex items-center justify-center py-20">
-                    <div className="text-white/50 text-lg">Loading order details...</div>
+            <div className="mx-auto max-w-300 px-4 py-8 lg:px-0">
+                <div className="flex flex-col items-center justify-center py-12 gap-6">
+                    <div className="text-center max-w-2xl">
+                        {/* Success Icon Skeleton */}
+                        <div className="mb-6 flex justify-center">
+                            <Skeleton className="w-24 h-24 rounded-full" />
+                        </div>
+
+                        {/* Heading Skeleton */}
+                        <Skeleton className="h-10 w-96 mx-auto mb-3 bg-[#2d3b30]" />
+                        <Skeleton className="h-6 w-48 mx-auto mb-8 bg-[#2d3b30]" />
+
+                        {/* Order Details Card Skeleton */}
+                        <div className="bg-surface-dark rounded-xl border border-[#28392e] p-6 mt-8">
+                            <div className="flex flex-col gap-4">
+                                {/* Header Skeleton */}
+                                <div className="flex justify-between items-center pb-4 border-b border-[#28392e]">
+                                    <div className="flex-1">
+                                        <Skeleton className="h-4 w-24 mb-2 bg-[#2d3b30]" />
+                                        <Skeleton className="h-6 w-32 bg-[#2d3b30]" />
+                                    </div>
+                                    <div className="text-right flex-1">
+                                        <Skeleton className="h-4 w-24 mb-2 ml-auto bg-[#2d3b30]" />
+                                        <Skeleton className="h-6 w-32 ml-auto bg-[#2d3b30]" />
+                                    </div>
+                                </div>
+
+                                {/* Status Skeletons */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <Skeleton className="h-4 w-32 mb-2 bg-[#2d3b30]" />
+                                        <Skeleton className="h-6 w-24 bg-[#2d3b30]" />
+                                    </div>
+                                    <div>
+                                        <Skeleton className="h-4 w-32 mb-2 bg-[#2d3b30]" />
+                                        <Skeleton className="h-6 w-24 bg-[#2d3b30]" />
+                                    </div>
+                                </div>
+
+                                {/* Address Skeleton */}
+                                <div className="pt-4">
+                                    <Skeleton className="h-4 w-28 mb-2 bg-[#2d3b30]" />
+                                    <Skeleton className="h-4 w-full mb-2 bg-[#2d3b30]" />
+                                    <Skeleton className="h-4 w-3/4 mb-2 bg-[#2d3b30]" />
+                                    <Skeleton className="h-4 w-2/3 bg-[#2d3b30]" />
+                                </div>
+
+                                {/* Items Skeleton */}
+                                <div className="pt-4">
+                                    <Skeleton className="h-4 w-32 mb-3 bg-[#2d3b30]" />
+                                    {[1, 2, 3].map(idx => (
+                                        <div key={idx} className="flex items-center gap-3 mb-3">
+                                            <Skeleton className="w-12 h-16 rounded bg-[#2d3b30]" />
+                                            <div className="flex-1">
+                                                <Skeleton className="h-4 w-24 mb-1 bg-[#2d3b30]" />
+                                                <Skeleton className="h-3 w-16 bg-[#2d3b30]" />
+                                            </div>
+                                            <Skeleton className="h-4 w-20 bg-[#2d3b30]" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Buttons Skeleton */}
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+                            <Skeleton className="h-10 w-40 bg-[#2d3b30]" />
+                            <Skeleton className="h-10 w-40 bg-[#2d3b30]" />
+                        </div>
+
+                        {/* Info Box Skeleton */}
+                        <div className="mt-8 p-4 bg-[#1a261e] rounded-lg border border-[#28392e]">
+                            <Skeleton className="h-4 w-full bg-[#2d3b30]" />
+                            <Skeleton className="h-4 w-3/4 mt-2 bg-[#2d3b30]" />
+                        </div>
+                    </div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="mx-auto max-w-[1200px] px-4 py-8 lg:px-0">
+        <div className="mx-auto max-w-300 px-4 py-8 lg:px-0">
             <div className="flex flex-col items-center justify-center py-12 gap-6">
                 <div className="text-center max-w-2xl">
                     {/* Success Icon */}
                     <div className="mb-6 flex justify-center">
-                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-green-500/20 to-green-600/20 border-2 border-green-500/50 flex items-center justify-center">
+                        <div className="w-24 h-24 rounded-full bg-linear-to-br from-green-500/20 to-green-600/20 border-2 border-green-500/50 flex items-center justify-center">
                             <CheckCircle className="text-green-500 w-16 h-16" />
                         </div>
                     </div>
@@ -190,7 +270,7 @@ const OrderSuccess = () => {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
                         <Link 
                             to="/profile?tab=orders" 
-                            className="px-6 py-3 bg-gradient-to-r from-secondary to-[#c49e50] hover:from-[#e3c578] hover:to-[#c49e50] text-[#0f1c15] font-bold rounded-lg transition-all"
+                            className="px-6 py-3 bg-linear-to-r from-secondary to-[#c49e50] hover:from-[#e3c578] hover:to-[#c49e50] text-[#0f1c15] font-bold rounded-lg transition-all"
                         >
                             View All Orders
                         </Link>

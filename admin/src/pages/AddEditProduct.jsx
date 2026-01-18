@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Plus, X, Upload, Save } from 'lucide-react';
 import { adminApi } from '../api/admin';
 import Loader from '../components/Loader';
+import { useToast } from '../components/Toast';
 
 const fabricOptions = ['Cotton', 'Silk', 'Georgette', 'Chiffon', 'Net', 'Crepe', 'Velvet', 'Linen', 'Rayon', 'Polyester', 'Other'];
 const occasionOptions = ['Wedding', 'Reception', 'Engagement', 'Mehendi', 'Sangeet', 'Party', 'Festival', 'Casual', 'Formal', 'Other'];
@@ -13,6 +14,7 @@ const AddEditProduct = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const isEdit = Boolean(id);
+    const { success: showSuccess, error: showError } = useToast();
 
     const [loading, setLoading] = useState(isEdit);
     const [saving, setSaving] = useState(false);
@@ -57,13 +59,20 @@ const AddEditProduct = () => {
         if (isEdit) {
             loadProduct();
         }
+        
+        // Set up interval to refresh categories every 5 seconds to catch newly created ones
+        const categoryRefreshInterval = setInterval(() => {
+            loadCategories();
+        }, 5000);
+
+        return () => clearInterval(categoryRefreshInterval);
     }, [id]);
 
     const loadCategories = async () => {
         try {
             const data = await adminApi.categories();
             setCategories(data?.categories || data || []);
-        } catch (err) {
+        } catch {
             // Handle error silently
         }
     };
@@ -159,7 +168,7 @@ const AddEditProduct = () => {
 
     const removeVariant = (index) => {
         if (formData.variants.length === 1) {
-            alert('At least one variant is required');
+            showError('At least one variant is required');
             return;
         }
         setFormData(prev => ({
@@ -204,13 +213,13 @@ const AddEditProduct = () => {
             for (const file of files) {
                 // Validate file type
                 if (!file.type.startsWith('image/')) {
-                    alert(`${file.name} is not an image file`);
+                    showError(`${file.name} is not an image file`);
                     continue;
                 }
 
                 // Validate file size (max 5MB)
                 if (file.size > 5 * 1024 * 1024) {
-                    alert(`${file.name} is too large. Max size is 5MB`);
+                    showError(`${file.name} is too large. Max size is 5MB`);
                     continue;
                 }
 
@@ -228,7 +237,7 @@ const AddEditProduct = () => {
                 }));
             }
         } catch (err) {
-            alert(err.message || 'Failed to upload image. Please try again or use URL instead.');
+            showError(err.message || 'Failed to upload image. Please try again or use URL instead.');
         } finally {
             setUploadingImage(false);
             // Reset file input
@@ -289,14 +298,16 @@ const AddEditProduct = () => {
 
             if (isEdit) {
                 await adminApi.updateProduct(id, payload);
-                alert('Product updated successfully!');
+                showSuccess('Product updated successfully!');
             } else {
                 await adminApi.createProduct(payload);
-                alert('Product created successfully!');
+                showSuccess('Product created successfully!');
             }
             navigate('/products');
         } catch (err) {
-            setError(err.message || 'Failed to save product');
+            const errorMessage = err.message || 'Failed to save product';
+            setError(errorMessage);
+            showError(errorMessage);
         } finally {
             setSaving(false);
         }
@@ -381,23 +392,42 @@ const AddEditProduct = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-2">
-                                Category <span className="text-red-500">*</span>
-                            </label>
-                            <select
-                                name="category"
-                                value={formData.category}
-                                onChange={handleInputChange}
-                                required
-                                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                            >
-                                <option value="">Select category</option>
-                                {categories.map(cat => (
-                                    <option key={cat._id || cat.id} value={cat._id || cat.id}>
-                                        {cat.name}
-                                    </option>
-                                ))}
-                            </select>
+                            <div className="flex items-center justify-between mb-2">
+                                <label className="block text-sm font-medium text-slate-700">
+                                    Category <span className="text-red-500">*</span>
+                                </label>
+                                <button
+                                    type="button"
+                                    onClick={loadCategories}
+                                    className="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition-colors"
+                                >
+                                    ↻ Refresh
+                                </button>
+                            </div>
+                            <div className="flex gap-2">
+                                <select
+                                    name="category"
+                                    value={formData.category}
+                                    onChange={handleInputChange}
+                                    required
+                                    className="flex-1 px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                    <option value="">Select category</option>
+                                    {categories.map(cat => (
+                                        <option key={cat._id || cat.id} value={cat._id || cat.id}>
+                                            {cat.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/categories')}
+                                    title="Create new category"
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+                                >
+                                    <Plus size={18} />
+                                </button>
+                            </div>
                         </div>
 
                         <div>
@@ -588,10 +618,9 @@ const AddEditProduct = () => {
                                         </label>
                                         <input
                                             type="number"
-                                            value={variant.finalPrice || 0}
+                                            value={variant.finalPrice}
                                             onChange={(e) => handleVariantChange(index, 'finalPrice', e.target.value)}
-                                            min="0"
-                                            step="0.01"
+                                            step="100"
                                             className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 bg-blue-50"
                                             placeholder="Auto-calculated"
                                         />

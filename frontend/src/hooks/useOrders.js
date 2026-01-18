@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
 import * as orderService from '../api/services/order.service';
 import { queryKeys } from '../api/queryClient';
 
@@ -36,7 +35,7 @@ export const useCreateOrder = () => {
 
   return useMutation({
     mutationFn: orderService.createOrder,
-    onSuccess: (data) => {
+    onSuccess: () => {
       // Clear cart after successful order
       queryClient.setQueryData(queryKeys.cart.items, { items: [] });
       

@@ -18,6 +18,8 @@ import {
 import StatCard from '../components/StatCard';
 import { adminApi } from '../api/admin';
 import Loader from '../components/Loader';
+import { SkeletonStatCard, SkeletonChart, Skeleton } from '../components/Skeleton';
+import { useToast } from '../components/Toast';
 
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -39,6 +41,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [timePeriod, setTimePeriod] = useState('1month');
+    const { error: showError } = useToast();
 
     useEffect(() => {
         let active = true;
@@ -133,7 +136,10 @@ const Dashboard = () => {
                 setRecentOrders(recentRes?.orders || recentRes || []);
             } catch (err) {
                 if (active) {
-                    setError(err.message || 'Unable to load dashboard data');
+                    const errorMsg = err.message || 'Unable to load dashboard data';
+                    setError(errorMsg);
+                    // Show toast after state update
+                    setTimeout(() => showError(errorMsg), 0);
                 }
             } finally {
                 if (active) {
@@ -147,6 +153,7 @@ const Dashboard = () => {
         return () => {
             active = false;
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [timePeriod]);
 
     const quickStats = summary?.quickStats || {};
@@ -186,6 +193,53 @@ const Dashboard = () => {
     const chartData = revenue.length
         ? revenue
         : monthNames.map((name) => ({ name, sales: 0 }));
+
+    // Loading state with skeletons
+    if (loading) {
+        return (
+            <div className="space-y-8">
+                <div>
+                    <Skeleton className="h-8 w-48 mb-2" />
+                    <Skeleton className="h-5 w-96" />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {[1, 2, 3, 4].map((i) => (
+                        <SkeletonStatCard key={i} />
+                    ))}
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2">
+                        <SkeletonChart />
+                    </div>
+                    <div className="bg-white border border-slate-100 rounded-2xl p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <Skeleton className="h-6 w-32" />
+                            <Skeleton className="h-6 w-16 rounded-full" />
+                        </div>
+                        <div className="space-y-4">
+                            {[1, 2, 3, 4, 5].map((i) => (
+                                <div key={i} className="flex items-center justify-between p-3">
+                                    <div className="flex items-center gap-3">
+                                        <Skeleton className="w-10 h-10 rounded-lg" />
+                                        <div className="space-y-2">
+                                            <Skeleton className="h-4 w-24" />
+                                            <Skeleton className="h-3 w-32" />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-2 text-right">
+                                        <Skeleton className="h-4 w-16" />
+                                        <Skeleton className="h-3 w-12" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">

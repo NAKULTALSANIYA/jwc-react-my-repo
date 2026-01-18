@@ -53,13 +53,12 @@ const Cart = () => {
         return typeof img === 'string' ? img : img.url || null;
     };
     const subtotal = items.reduce((acc, item) => acc + (getUnitPrice(item) * item.quantity), 0);
-    const tax = Math.round(subtotal * 0.18);
-    const total = subtotal + tax; // Tax included in total
+    const total = subtotal
 
     // Show loading state
     if (userLoading || cartLoading) {
         return (
-            <div className="mx-auto max-w-[1200px] px-4 py-8 lg:px-0">
+            <div className="mx-auto max-w-300 px-4 py-8 lg:px-0">
                 <div className="flex items-center justify-center py-20">
                     <div className="text-white/50 text-lg">Loading cart...</div>
                 </div>
@@ -69,7 +68,7 @@ const Cart = () => {
 
     // Show login/guest cart page
     return (
-        <div className="mx-auto max-w-[1200px] px-4 py-8 lg:px-0">
+        <div className="mx-auto max-w-300 px-4 py-8 lg:px-0">
             {/* Page Heading */}
             <div className="mb-8">
                 <h1 className="text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em] mb-2 font-display">Your Shopping Bag</h1>
@@ -90,7 +89,7 @@ const Cart = () => {
                                 <p className="text-white/60 mb-6">Looks like you haven't added anything to your cart yet. Start shopping to fill it up!</p>
                                 <Link 
                                     to="/products" 
-                                    className="inline-block px-6 py-3 bg-gradient-to-r from-secondary to-[#c49e50] hover:from-[#e3c578] hover:to-[#c49e50] text-[#0f1c15] font-bold rounded-lg transition-all"
+                                    className="inline-block px-6 py-3 bg-linear-to-r from-secondary to-[#c49e50] hover:from-[#e3c578] hover:to-[#c49e50] text-[#0f1c15] font-bold rounded-lg transition-all"
                                 >
                                     Continue Shopping
                                 </Link>
@@ -113,11 +112,11 @@ const Cart = () => {
                                         <div className="relative shrink-0 overflow-hidden rounded-lg border border-[#28392e]">
                                             {getImageUrl(item) ? (
                                                 <div
-                                                    className="bg-center bg-no-repeat aspect-[3/4] bg-cover w-[90px] md:w-[100px] hover:scale-105 transition-transform duration-500"
+                                                    className="bg-center bg-no-repeat aspect-3/4 bg-cover w-22.5 md:w-25 hover:scale-105 transition-transform duration-500"
                                                     style={{ backgroundImage: `url('${getImageUrl(item)}')` }}
                                                 ></div>
                                             ) : (
-                                                <div className="w-[90px] md:w-[100px] h-[120px] md:h-[133px] flex items-center justify-center bg-[#111813] text-white/20 text-xs">
+                                                <div className="w-22.5 md:w-25 h-30 md:h-33.25 flex items-center justify-center bg-[#111813] text-white/20 text-xs">
                                                     No Image
                                                 </div>
                                             )}
@@ -173,10 +172,6 @@ const Cart = () => {
 
                     {/* Info Strip */}
                     <div className="mt-4 flex flex-wrap gap-4 justify-center md:justify-start">
-                        {/* <div className="flex items-center gap-2 text-white/50 text-sm">
-                            <Truck className="text-secondary" />
-                            Free shipping on orders over ₹10,000
-                        </div> */}
                         <div className="flex items-center gap-2 text-white/50 text-sm">
                             <ShieldCheck className="text-secondary" />
                             100% Authentic Fabric
@@ -186,7 +181,7 @@ const Cart = () => {
 
                 {/* Order Summary Sticky */}
                 {items.length > 0 && (
-                    <div className="w-full lg:w-[380px] shrink-0 lg:sticky lg:top-24">
+                    <div className="w-full lg:w-95 shrink-0 lg:sticky lg:top-24">
                         <div className="flex flex-col gap-6 rounded-xl border border-solid border-[#3b5443] bg-surface-dark p-6 shadow-xl">
                             <h2 className="text-white text-xl font-bold leading-tight font-display pb-4 border-b border-[#28392e]">Order Summary</h2>
                             {/* Calculations */}
@@ -198,14 +193,6 @@ const Cart = () => {
                                 <div className="flex justify-between text-white/70 text-sm">
                                     <span>Discount</span>
                                     <span className="text-primary">- ₹0</span>
-                                </div>
-                                <div className="flex justify-between text-white/70 text-sm">
-                                    <span>Shipping</span>
-                                    <span className="text-primary">Free</span>
-                                </div>
-                                <div className="flex justify-between text-white/70 text-sm">
-                                    <span>Taxes & Charges (Incl.)</span>
-                                    <span className="text-white">₹{tax.toLocaleString()}</span>
                                 </div>
                             </div>
                             {/* Coupon */}
@@ -225,7 +212,7 @@ const Cart = () => {
                             {isGuest ? (
                                 <Link 
                                     to="/login" 
-                                    className="group relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-secondary to-[#c49e50] hover:from-[#e3c578] hover:to-[#c49e50] py-4 text-[#0f1c15] shadow-lg transition-all active:scale-[0.98]"
+                                    className="group relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-linear-to-r from-secondary to-[#c49e50] hover:from-[#e3c578] hover:to-[#c49e50] py-4 text-[#0f1c15] shadow-lg transition-all active:scale-[0.98]"
                                 >
                                     <span className="relative z-10 text-base font-bold uppercase tracking-widest flex items-center gap-2">
                                         <Lock className="w-5 h-5" />
@@ -234,7 +221,7 @@ const Cart = () => {
                                     </span>
                                 </Link>
                             ) : (
-                                <Link to="/checkout" className="group relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-secondary to-[#c49e50] hover:from-[#e3c578] hover:to-[#c49e50] py-4 text-[#0f1c15] shadow-lg transition-all active:scale-[0.98]">
+                                <Link to="/checkout" className="group relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-linear-to-r from-secondary to-[#c49e50] hover:from-[#e3c578] hover:to-[#c49e50] py-4 text-[#0f1c15] shadow-lg transition-all active:scale-[0.98]">
                                     <span className="relative z-10 text-base font-bold uppercase tracking-widest flex items-center gap-2">
                                         Proceed to Checkout
                                         <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />

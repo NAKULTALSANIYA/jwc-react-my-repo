@@ -9,7 +9,8 @@ import {
     Mail,
     LogOut,
     ChevronRight,
-    X
+    X,
+    Tag
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth.jsx';
 
@@ -21,6 +22,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     const menuItems = [
         { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/' },
         { name: 'Products', icon: <ShoppingBag size={20} />, path: '/products' },
+        { name: 'Categories', icon: <Tag size={20} />, path: '/categories' },
         { name: 'Orders', icon: <ShoppingCart size={20} />, path: '/orders' },
         { name: 'Customers', icon: <Users size={20} />, path: '/customers' },
         { name: 'Contacts', icon: <Mail size={20} />, path: '/contacts' },
@@ -100,7 +102,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
             {/* Logout Confirmation Modal */}
             {showLogoutConfirm && (
-                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-60 flex items-center justify-center p-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
                         <div className="flex items-center gap-4 mb-4">
                             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">

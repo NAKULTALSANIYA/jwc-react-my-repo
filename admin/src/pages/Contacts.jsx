@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { adminApi } from '../api/admin';
 import Loader from '../components/Loader';
+import { SkeletonContactCard } from '../components/Skeleton';
+import { useToast } from '../components/Toast';
 
 const Contacts = () => {
     const [contacts, setContacts] = useState([]);
@@ -27,6 +29,7 @@ const Contacts = () => {
     const [adminNotes, setAdminNotes] = useState('');
     const [markingStatus, setMarkingStatus] = useState(null);
     const [page, setPage] = useState(1);
+    const { success: showSuccess, error: showError } = useToast();
 
     // Load contacts and stats
     useEffect(() => {
@@ -46,7 +49,9 @@ const Contacts = () => {
             });
             setContacts(data?.contacts || []);
         } catch (err) {
-            setError(err.message || 'Failed to load contacts');
+            const errorMessage = err.message || 'Failed to load contacts';
+            setError(errorMessage);
+            showError(errorMessage);
             setContacts([]);
         } finally {
             setLoading(false);
@@ -69,8 +74,11 @@ const Contacts = () => {
             await adminApi.deleteContact(id);
             setContacts(contacts.filter(c => c._id !== id));
             loadStats();
+            showSuccess('Contact deleted successfully');
         } catch (err) {
-            setError(err.message || 'Failed to delete contact');
+            const errorMessage = err.message || 'Failed to delete contact';
+            setError(errorMessage);
+            showError(errorMessage);
         }
     };
 
@@ -89,8 +97,11 @@ const Contacts = () => {
             if (selectedContact?._id === id) {
                 setSelectedContact({ ...selectedContact, status });
             }
+            showSuccess('Status updated successfully');
         } catch (err) {
-            setError(err.message || 'Failed to update status');
+            const errorMessage = err.message || 'Failed to update status';
+            setError(errorMessage);
+            showError(errorMessage);
         } finally {
             setMarkingStatus(null);
         }
@@ -105,8 +116,11 @@ const Contacts = () => {
             setContacts(contacts.map(c =>
                 c._id === selectedContact._id ? { ...c, adminNotes } : c
             ));
+            showSuccess('Notes saved successfully');
         } catch (err) {
-            setError(err.message || 'Failed to save notes');
+            const errorMessage = err.message || 'Failed to save notes';
+            setError(errorMessage);
+            showError(errorMessage);
         }
     };
 
@@ -199,7 +213,11 @@ const Contacts = () => {
 
             {/* Contacts List */}
             {loading ? (
-                <Loader />
+                <div className="space-y-4">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                        <SkeletonContactCard key={i} />
+                    ))}
+                </div>
             ) : contacts.length === 0 ? (
                 <div className="bg-white rounded-lg border border-slate-200 p-8 text-center">
                     <MessageSquare size={48} className="mx-auto text-slate-400 mb-4" />

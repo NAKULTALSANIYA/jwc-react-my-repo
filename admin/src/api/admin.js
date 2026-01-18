@@ -26,6 +26,9 @@ export const adminApi = {
   
   // Categories
   categories: (params = {}) => apiClient.get(`/api/categories${toQuery(params)}`),
+  createCategory: (payload) => apiClient.post('/api/categories', payload),
+  updateCategory: (id, payload) => apiClient.put(`/api/categories/${id}`, payload),
+  deleteCategory: (id) => apiClient.del(`/api/categories/${id}`),
   
   // Orders & Customers
   orders: (params = {}) => apiClient.get(`/api/orders/admin/orders${toQuery(params)}`),  
