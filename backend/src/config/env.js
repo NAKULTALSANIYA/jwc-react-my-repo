@@ -25,6 +25,7 @@ const env = {
   EMAIL_PASS: process.env.EMAIL_PASS,
   FRONTEND_URL: process.env.FRONTEND_URL,
   FRONTEND_URLS: process.env.FRONTEND_URLS, // comma-separated list of allowed origins
+  BACKEND_URL: process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5000}`,
   COOKIE_DOMAIN: process.env.COOKIE_DOMAIN,
   COOKIE_SECURE: process.env.COOKIE_SECURE === 'true',
   COOKIE_SAMESITE: process.env.COOKIE_SAMESITE, // 'lax' | 'strict' | 'none'

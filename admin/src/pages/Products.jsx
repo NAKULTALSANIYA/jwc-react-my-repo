@@ -172,6 +172,10 @@ const Products = () => {
                                                     src={image || 'https://placehold.co/80x80?text=JWC'}
                                                     alt={product.name}
                                                     className="w-12 h-12 rounded-lg object-cover bg-slate-100"
+                                                    onError={(e) => {
+                                                        e.target.onerror = null;
+                                                        e.target.src = 'https://placehold.co/80x80?text=JWC';
+                                                    }}
                                                 />
                                                 <div>
                                                     <p className="font-bold text-sm">{product.name}</p>

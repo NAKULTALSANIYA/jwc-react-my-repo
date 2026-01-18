@@ -1,6 +1,12 @@
-import cloudinary from '../config/cloudinary.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import ApiResponse from '../utils/ApiResponse.js';
 import ApiError from '../utils/ApiError.js';
+import env from '../config/env.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class UploadController {
   async uploadImage(req, res, next) {
@@ -9,31 +15,15 @@ class UploadController {
         throw new ApiError(400, 'No image file provided');
       }
 
-      // Upload to Cloudinary
-      const result = await new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          {
-            folder: 'jwc-products',
-            resource_type: 'image',
-            transformation: [
-              { width: 1000, height: 1000, crop: 'limit' },
-              { quality: 'auto' }
-            ]
-          },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        );
-
-        uploadStream.end(req.file.buffer);
-      });
+      // Generate URL for the uploaded file
+      const url = `${env.BACKEND_URL}/uploads/${req.file.filename}`;
 
       return ApiResponse.success(res, 'Image uploaded successfully', {
-        url: result.secure_url,
-        publicId: result.public_id,
-        width: result.width,
-        height: result.height
+        url: url,
+        filename: req.file.filename,
+        originalName: req.file.originalname,
+        size: req.file.size,
+        mimetype: req.file.mimetype
       });
     } catch (error) {
       next(error);
@@ -46,33 +36,13 @@ class UploadController {
         throw new ApiError(400, 'No image files provided');
       }
 
-      const uploadPromises = req.files.map(file => 
-        new Promise((resolve, reject) => {
-          const uploadStream = cloudinary.uploader.upload_stream(
-            {
-              folder: 'jwc-products',
-              resource_type: 'image',
-              transformation: [
-                { width: 1000, height: 1000, crop: 'limit' },
-                { quality: 'auto' }
-              ]
-            },
-            (error, result) => {
-              if (error) reject(error);
-              else resolve({
-                url: result.secure_url,
-                publicId: result.public_id,
-                width: result.width,
-                height: result.height
-              });
-            }
-          );
-
-          uploadStream.end(file.buffer);
-        })
-      );
-
-      const results = await Promise.all(uploadPromises);
+      const results = req.files.map(file => ({
+        url: `${env.BACKEND_URL}/uploads/${file.filename}`,
+        filename: file.filename,
+        originalName: file.originalname,
+        size: file.size,
+        mimetype: file.mimetype
+      }));
 
       return ApiResponse.success(res, 'Images uploaded successfully', { images: results });
     } catch (error) {
@@ -82,13 +52,21 @@ class UploadController {
 
   async deleteImage(req, res, next) {
     try {
-      const { publicId } = req.body;
+      const { filename } = req.body;
 
-      if (!publicId) {
-        throw new ApiError(400, 'Public ID is required');
+      if (!filename) {
+        throw new ApiError(400, 'Filename is required');
       }
 
-      await cloudinary.uploader.destroy(publicId);
+      const filePath = path.join(__dirname, '../../uploads', filename);
+
+      // Check if file exists
+      if (!fs.existsSync(filePath)) {
+        throw new ApiError(404, 'File not found');
+      }
+
+      // Delete the file
+      fs.unlinkSync(filePath);
 
       return ApiResponse.success(res, 'Image deleted successfully');
     } catch (error) {

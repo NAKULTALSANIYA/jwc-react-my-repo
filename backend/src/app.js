@@ -5,6 +5,8 @@ import rateLimit from 'express-rate-limit';
 import session from 'express-session';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import env from './config/env.js';
 import connectDB from './config/database.js';
 import './config/passport.js'; // Import passport configuration
@@ -25,6 +27,9 @@ import dashboardRoutes from './routes/dashboard.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 
 // Rate limiting
@@ -39,7 +44,15 @@ const limiter = rateLimit({
 });
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin resource loading
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      "img-src": ["'self'", "data:", "https:", "http:"],
+    },
+  },
+}));
 app.use(limiter);
 
 // CORS configuration (support multiple origins)
@@ -65,6 +78,22 @@ app.use(cors(corsOptions));
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Serve static files from uploads folder with explicit CORS headers
+app.use('/uploads', (req, res, next) => {
+  const origin = req.headers.origin;
+  if (!origin || allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin || allowedOrigins[0] || '*');
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }
+  res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+}, express.static(path.join(__dirname, '../uploads')));
 
 // Cookie parser (needed for reading cookies in auth middleware)
 app.use(cookieParser());

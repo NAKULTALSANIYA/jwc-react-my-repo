@@ -223,18 +223,28 @@ const AddEditProduct = () => {
                     continue;
                 }
 
-                // Upload to backend/cloudinary
+                // Upload to backend
                 const response = await adminApi.uploadImage(file);
+                
+                // Response should be { url, filename, originalName, size, mimetype }
+                const imageUrl = response?.url;
+                
+                if (!imageUrl) {
+                    showError('Failed to get image URL from server');
+                    continue;
+                }
                 
                 // Add uploaded image URL to formData
                 setFormData(prev => ({
                     ...prev,
                     images: [...prev.images, { 
-                        url: response.url || response.data?.url, 
+                        url: imageUrl, 
                         alt: prev.name || 'Product Image', 
                         isPrimary: prev.images.length === 0 
                     }]
                 }));
+                
+                showSuccess('Image uploaded successfully');
             }
         } catch (err) {
             showError(err.message || 'Failed to upload image. Please try again or use URL instead.');
@@ -710,12 +720,16 @@ const AddEditProduct = () => {
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            {formData.images.map((image, index) => (
+                            {formData.images.length > 0 ? formData.images.map((image, index) => (
                                 <div key={index} className="relative group">
                                     <img
                                         src={image.url}
                                         alt={image.alt || 'Product'}
                                         className="w-full h-32 object-cover rounded-lg border border-slate-200"
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = 'https://placehold.co/400x300/e2e8f0/64748b?text=Image+Error';
+                                        }}
                                     />
                                     <button
                                         type="button"
@@ -730,7 +744,11 @@ const AddEditProduct = () => {
                                         </span>
                                     )}
                                 </div>
-                            ))}
+                            )) : (
+                                <div className="col-span-full text-center py-8 text-slate-400 text-sm">
+                                    No images uploaded yet
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

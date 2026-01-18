@@ -426,7 +426,15 @@ const Products = () => {
                                 >
                                     <div className="relative w-full aspect-3/4 overflow-hidden bg-gray-900">
                                         {product.image ? (
-                                            <img className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src={product.image} alt={product.name} />
+                                            <img 
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                                                src={product.image} 
+                                                alt={product.name}
+                                                onError={(e) => {
+                                                    e.target.onerror = null;
+                                                    e.target.src = 'https://placehold.co/400x600/1a261e/0dc93c?text=' + encodeURIComponent(product.name || 'Product');
+                                                }}
+                                            />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-white/30">
                                                 <span className="text-sm">No Image</span>
