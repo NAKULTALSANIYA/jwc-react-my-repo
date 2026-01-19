@@ -7,8 +7,8 @@ const rawCookieSecure = process.env.COOKIE_SECURE;
 const cookieSecure = rawCookieSecure === undefined ? undefined : rawCookieSecure === 'true';
 
 const env = {
-  NODE_ENV: process.env.NODE_ENV || 'development',
-  PORT: process.env.PORT || 5000,
+  NODE_ENV: process.env.NODE_ENV,
+  PORT: process.env.PORT,
   MONGODB_URI: process.env.MONGODB_URI,
   JWT_SECRET: process.env.JWT_SECRET,
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
@@ -29,7 +29,7 @@ const env = {
   EMAIL_PASS: process.env.EMAIL_PASS,
   FRONTEND_URL: process.env.FRONTEND_URL,
   FRONTEND_URLS: process.env.FRONTEND_URLS, // comma-separated list of allowed origins
-  BACKEND_URL: process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5000}`,
+  BACKEND_URL: process.env.BACKEND_URL,
   COOKIE_DOMAIN: process.env.COOKIE_DOMAIN,
   COOKIE_SECURE: cookieSecure,
   COOKIE_SAMESITE: process.env.COOKIE_SAMESITE, // 'lax' | 'strict' | 'none'

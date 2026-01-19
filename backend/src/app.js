@@ -34,7 +34,11 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Behind a proxy/load balancer (e.g., Nginx) we need to trust X-Forwarded-* headers
-app.set('trust proxy', 1)
+const trustedProxies = ['loopback', 'linklocal', 'uniquelocal'];
+const enableTrustProxy = env.NODE_ENV === 'production';
+if (enableTrustProxy) {
+  app.set('trust proxy', trustedProxies);
+}
 
 // Rate limiting with proper trust proxy handling
 const limiter = rateLimit({
@@ -43,6 +47,8 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
+  // express-rate-limit requires this to match Express trust proxy when enabled
+  trustProxy: enableTrustProxy,
 
   keyGenerator: (req) => {
     return req.ip;
@@ -118,7 +124,8 @@ app.use(session({
   secret: env.SESSION_SECRET || 'your-secret-key-change-this-in-production',
   resave: false,
   saveUninitialized: false,
-  store: env.NODE_ENV === 'production' ? new MongoStore({
+  // Always prefer Mongo-backed sessions when a URI is available to avoid MemoryStore in prod
+  store: mongoUrl ? new MongoStore({
     mongoUrl: mongoUrl,
     touchAfter: 24 * 3600 // lazy session update interval (in seconds)
   }) : undefined,
