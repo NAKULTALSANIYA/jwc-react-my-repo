@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import session from 'express-session';
+import MongoStore from 'connect-mongo';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import path from 'path';
@@ -33,17 +34,25 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Behind a proxy/load balancer (e.g., Nginx) we need to trust X-Forwarded-* headers
-if (env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1);
-}
+app.set('trust proxy', 1)
 
-// Rate limiting
+// Rate limiting with proper trust proxy handling
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5000, // limit each IP to 5000 requests per windowMs (increased from 100)
+  windowMs: 15 * 60 * 1000,
+  max: 5000,
   message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+
+  keyGenerator: (req) => {
+    return req.ip;
+  },
+
   skip: (req) => {
-    // Skip rate limiting for authenticated users on dashboard endpoints
+    // ✅ Skip socket.io handshake
+    if (req.path.startsWith('/socket.io')) return true;
+
+    // Skip rate limiting for authenticated dashboard users
     return req.path.startsWith('/api/dashboard') && req.user;
   }
 });
@@ -104,10 +113,15 @@ app.use('/uploads', (req, res, next) => {
 app.use(cookieParser());
 
 // Session configuration
+const mongoUrl = env.MONGODB_URI || 'mongodb://localhost:27017/ecommerce';
 app.use(session({
   secret: env.SESSION_SECRET || 'your-secret-key-change-this-in-production',
   resave: false,
   saveUninitialized: false,
+  store: env.NODE_ENV === 'production' ? new MongoStore({
+    mongoUrl: mongoUrl,
+    touchAfter: 24 * 3600 // lazy session update interval (in seconds)
+  }) : undefined,
   cookie: {
     secure: env.COOKIE_SECURE !== undefined ? env.COOKIE_SECURE : env.NODE_ENV === 'production',
     sameSite: env.COOKIE_SAMESITE || (env.NODE_ENV === 'production' ? 'none' : 'lax'),
