@@ -27,8 +27,10 @@ export const initSocketServer = (httpServer) => {
   if (ioInstance) return ioInstance;
 
   const allowedOrigins = buildAllowedOrigins();
+  const isProduction = process.env.NODE_ENV === 'production';
 
   ioInstance = new Server(httpServer, {
+    path: '/socket.io/',
     cors: {
       origin: (origin, callback) => {
         if (!origin) return callback(null, true);
@@ -39,7 +41,24 @@ export const initSocketServer = (httpServer) => {
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     },
-    transports: ['websocket', 'polling'],
+    // Production-optimized transport settings
+    transports: isProduction ? ['websocket', 'polling'] : ['websocket', 'polling'],
+    // Connection settings
+    connectionStateRecovery: {
+      maxDisconnectionDuration: 2 * 60 * 1000,
+      skipMiddlewares: true,
+    },
+    // Ping/Pong for connection health
+    pingInterval: 25000,
+    pingTimeout: 20000,
+    // Upgrade timeout (important for Nginx)
+    upgradeTimeout: 10000,
+    // Max HTTP buffer size
+    maxHttpBufferSize: 1e6,
+    // Enable compression for production
+    ...(isProduction && {
+      serveClient: false, // Don't serve socket.io client (let frontend bundle it)
+    }),
   });
 
   ioInstance.use(async (socket, next) => {

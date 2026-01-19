@@ -5,7 +5,7 @@ const isProd = env.NODE_ENV === 'production';
 // Compute sane defaults for cookie options depending on environment
 export const getCookieOptions = ({ maxAge } = {}) => {
   const sameSite = env.COOKIE_SAMESITE || (isProd ? 'none' : 'lax');
-  const secure = typeof env.COOKIE_SECURE === 'boolean' ? env.COOKIE_SECURE : isProd;
+  const secure = env.COOKIE_SECURE !== undefined ? env.COOKIE_SECURE : isProd;
 
   const base = {
     httpOnly: true,

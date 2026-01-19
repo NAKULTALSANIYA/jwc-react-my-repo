@@ -20,9 +20,33 @@ export const getAdminSocket = (token) => {
 
   if (!adminSocket) {
     adminSocket = io(SOCKET_URL, {
+      path: '/socket.io/', // Explicit path for Nginx compatibility
       autoConnect: false,
-      transports: ['websocket'],
+      // Order matters: websocket first, fallback to polling
+      transports: ['websocket', 'polling'],
       withCredentials: true,
+      auth: { token },
+      // Connection settings for production
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 5,
+      // Ping/Pong settings
+      pingInterval: 25000,
+      pingTimeout: 20000,
+      // Timeouts
+      upgradeTimeout: 10000,
+      // Enable for production debugging
+      debug: false,
+    });
+
+    // Error handling
+    adminSocket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+    });
+
+    adminSocket.on('disconnect', (reason) => {
+      console.info('Socket disconnected:', reason);
     });
   }
 

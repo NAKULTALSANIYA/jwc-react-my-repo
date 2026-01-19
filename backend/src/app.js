@@ -32,6 +32,11 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// Behind a proxy/load balancer (e.g., Nginx) we need to trust X-Forwarded-* headers
+if (env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -104,9 +109,11 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: env.NODE_ENV === 'production', // Use secure cookies in production
+    secure: env.COOKIE_SECURE !== undefined ? env.COOKIE_SECURE : env.NODE_ENV === 'production',
+    sameSite: env.COOKIE_SAMESITE || (env.NODE_ENV === 'production' ? 'none' : 'lax'),
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    ...(env.COOKIE_DOMAIN ? { domain: env.COOKIE_DOMAIN } : {}),
   }
 }));
 

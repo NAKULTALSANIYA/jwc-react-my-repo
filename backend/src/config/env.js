@@ -2,6 +2,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Preserve tri-state for cookie secure so "not provided" can default to NODE_ENV
+const rawCookieSecure = process.env.COOKIE_SECURE;
+const cookieSecure = rawCookieSecure === undefined ? undefined : rawCookieSecure === 'true';
+
 const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: process.env.PORT || 5000,
@@ -27,7 +31,7 @@ const env = {
   FRONTEND_URLS: process.env.FRONTEND_URLS, // comma-separated list of allowed origins
   BACKEND_URL: process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5000}`,
   COOKIE_DOMAIN: process.env.COOKIE_DOMAIN,
-  COOKIE_SECURE: process.env.COOKIE_SECURE === 'true',
+  COOKIE_SECURE: cookieSecure,
   COOKIE_SAMESITE: process.env.COOKIE_SAMESITE, // 'lax' | 'strict' | 'none'
 };
 
