@@ -176,7 +176,7 @@ const Footer = () => {
 };
 
 const WhatsAppButton = () => {
-    const phoneNumber = '917203045055';
+    const phoneNumber = '919998717666';
     const prefilledMessage = 'Hi! I want to know more about Jalaram Wedding Couture.';
     const chatUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(prefilledMessage)}`;
 
