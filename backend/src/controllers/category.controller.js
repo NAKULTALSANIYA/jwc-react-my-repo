@@ -84,6 +84,16 @@ class CategoryController {
   }
 
   // Public routes
+  async getHomeOccasions(req, res, next) {
+    try {
+      const categories = await CategoryService.getHomeOccasions();
+      
+      return ApiResponse.success(res, 'Home occasions retrieved successfully', { data: categories });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getCategoryTree(req, res, next) {
     try {
       const tree = await CategoryService.getCategoryTree();

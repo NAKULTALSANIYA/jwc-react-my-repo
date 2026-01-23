@@ -6,6 +6,14 @@ import { isAdmin, isManager } from '../middlewares/role.js';
 
 const router = express.Router();
 
+// Public routes (must come before protected routes)
+router.get('/public/home-occasions', CategoryController.getHomeOccasions);
+router.get('/public/root', CategoryController.getRootCategories);
+router.get('/public/tree', CategoryController.getCategoryTree);
+router.get('/public/with-products', CategoryController.getCategoriesWithProducts);
+router.get('/public/slug/:slug', CategoryController.getCategoryBySlug);
+router.get('/public/:parentId/subcategories', CategoryController.getSubcategories);
+
 // Admin routes - Category CRUD
 router.post('/', authenticate, isManager, CategoryController.createCategory);
 router.get('/', authenticate, isManager, CategoryController.getAllCategories);
@@ -14,12 +22,5 @@ router.get('/:id', authenticate, isManager, CategoryController.getCategoryById);
 router.put('/:id', authenticate, isManager, CategoryController.updateCategory);
 router.delete('/:id', authenticate, isManager, CategoryController.deleteCategory);
 router.patch('/:id/toggle-status', authenticate, isManager, CategoryController.toggleCategoryStatus);
-
-// Public routes
-router.get('/public/root', CategoryController.getRootCategories);
-router.get('/public/tree', CategoryController.getCategoryTree);
-router.get('/public/with-products', CategoryController.getCategoriesWithProducts);
-router.get('/public/slug/:slug', CategoryController.getCategoryBySlug);
-router.get('/public/:parentId/subcategories', CategoryController.getSubcategories);
 
 export default router;

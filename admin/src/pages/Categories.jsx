@@ -28,7 +28,10 @@ const Categories = () => {
         name: '',
         description: '',
         image: '',
-        isActive: true
+        imageUrl: '',
+        isActive: true,
+        displayOnHome: false,
+        sequence: 0
     });
 
     const loadCategories = useCallback(async () => {
@@ -87,7 +90,10 @@ const Categories = () => {
             name: category.name || '',
             description: category.description || '',
             image: category.image || '',
-            isActive: category.isActive !== false
+            imageUrl: category.imageUrl || '',
+            isActive: category.isActive !== false,
+            displayOnHome: category.displayOnHome || false,
+            sequence: category.sequence || 0
         });
         setShowModal(true);
     };
@@ -113,9 +119,12 @@ const Categories = () => {
             name: '',
             description: '',
             image: '',
+            imageUrl: '',
             seoTitle: '',
             seoDescription: '',
-            isActive: true
+            isActive: true,
+            displayOnHome: false,
+            sequence: 0
         });
         setEditingId(null);
     };
@@ -350,6 +359,52 @@ const Categories = () => {
                                     className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
                                     placeholder="https://example.com/image.jpg"
                                 />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Image URL (Alternative)
+                                </label>
+                                <input
+                                    type="text"
+                                    name="imageUrl"
+                                    value={formData.imageUrl}
+                                    onChange={handleInputChange}
+                                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                                    placeholder="https://example.com/image.jpg"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                        Sequence Order
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="sequence"
+                                        value={formData.sequence}
+                                        onChange={handleInputChange}
+                                        min="0"
+                                        className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                                        placeholder="0"
+                                    />
+                                    <p className="text-xs text-slate-500 mt-1">Lower numbers appear first on home page</p>
+                                </div>
+
+                                <div className="flex flex-col justify-end gap-2">
+                                    <label className="flex items-center gap-3">
+                                        <input
+                                            type="checkbox"
+                                            name="displayOnHome"
+                                            checked={formData.displayOnHome}
+                                            onChange={handleInputChange}
+                                            className="w-4 h-4 rounded border-slate-300 cursor-pointer"
+                                        />
+                                        <span className="text-sm font-medium text-slate-700">Display on Home Page</span>
+                                    </label>
+                                    <p className="text-xs text-slate-500">Show this occasion in the "Shop by Occasion" section</p>
+                                </div>
                             </div>
 
                             <div className="flex items-center gap-3">

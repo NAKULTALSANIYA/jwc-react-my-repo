@@ -62,6 +62,13 @@ export const adminApi = {
   updateContactStatus: (id, payload) => apiClient.patch(`/api/contact/${id}/status`, payload),
   addAdminNotes: (id, payload) => apiClient.patch(`/api/contact/${id}/notes`, payload),
   deleteContact: (id) => apiClient.del(`/api/contact/${id}`),
+
+  // Videos
+  videos: (params = {}) => apiClient.get(`/api/videos${toQuery(params)}`),
+  getVideo: (id) => apiClient.get(`/api/videos/${id}`),
+  createVideo: (payload) => apiClient.post('/api/videos', payload),
+  updateVideo: (id, payload) => apiClient.put(`/api/videos/${id}`, payload),
+  deleteVideo: (id) => apiClient.del(`/api/videos/${id}`),
 };
 
 export { toQuery };

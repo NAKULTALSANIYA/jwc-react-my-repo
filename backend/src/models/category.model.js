@@ -33,9 +33,23 @@ const categorySchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  imageUrl: {
+    type: String,
+    default: '',
+  },
   isActive: {
     type: Boolean,
     default: true,
+  },
+  displayOnHome: {
+    type: Boolean,
+    default: false,
+    description: 'Whether this occasion category should be displayed on the home page'
+  },
+  sequence: {
+    type: Number,
+    default: 0,
+    description: 'Order in which categories appear on home page (lower numbers appear first)'
   },
   order: {
     type: Number,
@@ -67,6 +81,7 @@ const categorySchema = new mongoose.Schema({
 categorySchema.index({ parent: 1 });
 categorySchema.index({ level: 1 });
 categorySchema.index({ isActive: 1 });
+categorySchema.index({ displayOnHome: 1, sequence: 1 });
 
 // Generate slug before saving
 categorySchema.pre('save', async function(next) {

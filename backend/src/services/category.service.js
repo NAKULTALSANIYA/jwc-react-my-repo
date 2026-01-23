@@ -155,6 +155,27 @@ class CategoryService {
     }
   }
 
+  async getHomeOccasions() {
+    try {
+      // Fetch categories that are displayed on home page, sorted by sequence
+      const categories = await CategoryDAO.findAll(
+        { displayOnHome: true, isActive: true },
+        1,
+        100
+      );
+      
+      // Sort by sequence
+      const sorted = Array.isArray(categories) 
+        ? categories.sort((a, b) => (a.sequence || 0) - (b.sequence || 0))
+        : [];
+      
+      return sorted;
+    } catch (error) {
+      logger.error('Get home occasions error:', error);
+      throw error;
+    }
+  }
+
   async getRootCategories() {
     try {
       const categories = await CategoryDAO.findRootCategories();
