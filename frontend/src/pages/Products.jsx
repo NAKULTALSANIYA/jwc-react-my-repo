@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { getProducts } from '../api/services/product.service';
 import { useToggleWishlist, useWishlist } from '../hooks/useExtras';
@@ -11,6 +11,10 @@ const Skeleton = ({ className }) => (
 );
 
 const Products = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const categoryFromUrl = searchParams.get('category');
+    
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [priceRange, setPriceRange] = useState(50000);
@@ -22,6 +26,7 @@ const Products = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [availableCategories, setAvailableCategories] = useState([]);
+    const [availableCategoryIds, setAvailableCategoryIds] = useState([]);
     const [availableColors, setAvailableColors] = useState([]);
     const [availableSizes, setAvailableSizes] = useState([]);
     const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
@@ -69,6 +74,7 @@ const Products = () => {
             price,
             originalPrice,
             category: product?.category?.name || 'Product',
+            categoryId: product?.category?._id || null,
             colors,
             sizes,
             variantId: activeVariant?._id,
@@ -86,13 +92,25 @@ const Products = () => {
             const normalized = apiProducts.map(normalizeProduct);
 
             setProducts(normalized);
-            setFilteredProducts(normalized);
+            
+            // Apply category filter immediately if URL parameter exists
+            let initialFiltered = normalized;
+            if (categoryFromUrl) {
+                initialFiltered = normalized.filter(product => product.categoryId === categoryFromUrl);
+                const matchingCategory = normalized.find(p => p.categoryId === categoryFromUrl);
+                if (matchingCategory) {
+                    setSelectedCategories([matchingCategory.category]);
+                }
+            }
+            setFilteredProducts(initialFiltered);
 
             const categories = [...new Set(normalized.map(p => p.category).filter(Boolean))];
+            const categoryIds = [...new Set(normalized.map(p => ({ id: p.categoryId, name: p.category })).filter(c => c.id))];
             const colors = [...new Set(normalized.flatMap(p => p.colors || []))];
             const sizes = [...new Set(normalized.flatMap(p => p.sizes || []))];
 
             setAvailableCategories(categories);
+            setAvailableCategoryIds(categoryIds);
             setAvailableColors(colors);
             setAvailableSizes(sizes);
 
@@ -107,7 +125,7 @@ const Products = () => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [categoryFromUrl]);
 
     useEffect(() => {
         fetchProducts();
@@ -139,7 +157,10 @@ const Products = () => {
     useEffect(() => {
         let result = [...products];
 
-        if (selectedCategories.length > 0) {
+        // Filter by URL category parameter if present
+        if (categoryFromUrl) {
+            result = result.filter(product => product.categoryId === categoryFromUrl);
+        } else if (selectedCategories.length > 0) {
             result = result.filter(product => selectedCategories.includes(product.category));
         }
 
@@ -160,7 +181,7 @@ const Products = () => {
         }
 
         setFilteredProducts(result);
-    }, [products, priceRange, selectedCategories, selectedColors, selectedSizes, sortBy]);
+    }, [products, priceRange, selectedCategories, selectedColors, selectedSizes, sortBy, categoryFromUrl]);
 
     const toggleCategory = (category) => {
         setSelectedCategories(prev =>
@@ -186,6 +207,8 @@ const Products = () => {
         setSelectedSizes([]);
         setPriceRange(maxPrice);
         setSortBy("Recommended");
+        // Clear URL parameters to remove category filter
+        navigate('/products', { replace: true });
     };
 
     const categoryOptions = availableCategories.length ? availableCategories : ["Sherwani", "Indo-Western", "Kurta Sets"];

@@ -69,6 +69,11 @@ export const adminApi = {
   createVideo: (payload) => apiClient.post('/api/videos', payload),
   updateVideo: (id, payload) => apiClient.put(`/api/videos/${id}`, payload),
   deleteVideo: (id) => apiClient.del(`/api/videos/${id}`),
+  uploadVideo: (file) => {
+    const formData = new FormData();
+    formData.append('video', file);
+    return apiClient.post('/api/videos/upload', formData);
+  },
 };
 
 export { toQuery };

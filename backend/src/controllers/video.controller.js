@@ -94,3 +94,37 @@ export const deleteVideo = async (req, res) => {
         });
     }
 };
+
+// Controller to upload video file
+export const uploadVideo = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: 'No video file provided'
+            });
+        }
+
+        // Construct an absolute video URL so the frontend can play it reliably
+        const relativePath = `/uploads/videos/${req.file.filename}`;
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const videoUrl = `${baseUrl}${relativePath}`;
+        
+        res.status(200).json({
+            success: true,
+            message: 'Video uploaded successfully',
+            data: {
+                url: videoUrl,
+                relativePath,
+                filename: req.file.filename,
+                size: req.file.size
+            }
+        });
+    } catch (error) {
+        console.error('Error uploading video:', error);
+        res.status(500).json({ 
+            success: false,
+            message: error.message || 'Error uploading video'
+        });
+    }
+};

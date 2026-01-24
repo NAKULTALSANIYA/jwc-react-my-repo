@@ -2,6 +2,16 @@ import React, { useEffect } from 'react';
 import { X, ShoppingCart, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+const buildMediaUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    const rawBase = import.meta.env.VITE_API_URL || '';
+    const baseNoSlash = rawBase.replace(/\/$/, '');
+    const base = baseNoSlash.replace(/\/api$/, ''); // strip trailing /api to avoid /api/uploads
+    const needsSlash = url.startsWith('/') ? '' : '/';
+    return `${base}${needsSlash}${url}`;
+};
+
 const VideoModal = ({ video, onClose }) => {
     if (!video) return null;
 
@@ -47,7 +57,7 @@ const VideoModal = ({ video, onClose }) => {
                     <div className="space-y-4">
                         <div className="relative overflow-hidden rounded-xl">
                             <video 
-                                src={video.url} 
+                                src={buildMediaUrl(video.url)} 
                                 controls 
                                 autoPlay
                                 className="w-full aspect-video object-cover rounded-xl"

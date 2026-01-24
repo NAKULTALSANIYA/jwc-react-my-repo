@@ -34,12 +34,24 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Behind a proxy/load balancer (e.g., Nginx) we need to trust X-Forwarded-* headers
-const trustedProxies = ['loopback', 'linklocal', 'uniquelocal'];
+// Behind a proxy/load balancer (e.g., Nginx/Cloudflare) we need to trust X-Forwarded-* headers
 const enableTrustProxy = env.NODE_ENV === 'production';
 if (enableTrustProxy) {
-  app.set('trust proxy', trustedProxies);
+  // Trust only the first proxy (typical for single hop: CDN or LB)
+  app.set('trust proxy', 1);
 }
+
+// Normalize client IP so rate limiter works correctly behind CDNs/proxies
+const getClientIp = (req) => {
+  const cfIp = req.headers['cf-connecting-ip'];
+  const realIp = req.headers['x-real-ip'];
+  const forwarded = req.headers['x-forwarded-for'];
+
+  if (cfIp) return cfIp;
+  if (realIp) return realIp;
+  if (forwarded) return forwarded.split(',')[0].trim();
+  return req.ip;
+};
 
 // Rate limiting with proper trust proxy handling
 const limiter = rateLimit({
@@ -51,9 +63,7 @@ const limiter = rateLimit({
   // express-rate-limit requires this to match Express trust proxy when enabled
   trustProxy: enableTrustProxy,
 
-  keyGenerator: (req) => {
-    return req.ip;
-  },
+  keyGenerator: (req) => getClientIp(req),
 
   skip: (req) => {
     // ✅ Skip socket.io handshake
