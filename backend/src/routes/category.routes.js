@@ -8,6 +8,8 @@ const router = express.Router();
 
 // Public routes (must come before protected routes)
 router.get('/public/home-occasions', CategoryController.getHomeOccasions);
+router.get('/public/women', CategoryController.getWomenCategories);
+router.get('/public/accessories', CategoryController.getAccessoriesCategories);
 router.get('/public/root', CategoryController.getRootCategories);
 router.get('/public/tree', CategoryController.getCategoryTree);
 router.get('/public/with-products', CategoryController.getCategoriesWithProducts);

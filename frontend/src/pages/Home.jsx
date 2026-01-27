@@ -3,7 +3,7 @@
     import { Shirt, Gem, Truck, ShieldCheck, ArrowRight, MoveRight, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
     import VideoModal from '../components/VideoModal';
     import { getVideos } from '../api/services/video.service';
-    import { getHomeOccasions } from '../api/services/occasion.service';
+    import { getHomeOccasions, getWomenCategories, getAccessoriesCategories } from '../api/services/occasion.service';
 
     const Home = () => {
         const navigate = useNavigate();
@@ -31,6 +31,16 @@
         const [categoriesLoading, setCategoriesLoading] = useState(false);
         const categoryScrollRef = useRef(null);
         const categoryAutoScrollRef = useRef(null);
+
+        // Women Categories
+        const [womenCategories, setWomenCategories] = useState([]);
+        const [womenLoading, setWomenLoading] = useState(false);
+        const womenScrollRef = useRef(null);
+
+        // Accessories Categories
+        const [accessoriesCategories, setAccessoriesCategories] = useState([]);
+        const [accessoriesLoading, setAccessoriesLoading] = useState(false);
+        const accessoriesScrollRef = useRef(null);
 
         // Hero slider touch/mouse tracking
         const heroSectionRef = useRef(null);
@@ -175,6 +185,44 @@
                 }
             };
             fetchCategories();
+        }, []);
+
+        // Fetch women categories
+        useEffect(() => {
+            const fetchWomenCategories = async () => {
+                try {
+                    setWomenLoading(true);
+                    const response = await getWomenCategories();
+                    if (response.success && response.data) {
+                        const womenData = response.data.data || response.data;
+                        setWomenCategories(Array.isArray(womenData) ? womenData : []);
+                    }
+                } catch (error) {
+                    console.error('Error fetching women categories:', error);
+                } finally {
+                    setWomenLoading(false);
+                }
+            };
+            fetchWomenCategories();
+        }, []);
+
+        // Fetch accessories categories
+        useEffect(() => {
+            const fetchAccessoriesCategories = async () => {
+                try {
+                    setAccessoriesLoading(true);
+                    const response = await getAccessoriesCategories();
+                    if (response.success && response.data) {
+                        const accessoriesData = response.data.data || response.data;
+                        setAccessoriesCategories(Array.isArray(accessoriesData) ? accessoriesData : []);
+                    }
+                } catch (error) {
+                    console.error('Error fetching accessories categories:', error);
+                } finally {
+                    setAccessoriesLoading(false);
+                }
+            };
+            fetchAccessoriesCategories();
         }, []);
 
         // Auto-advance occasions slider by one full card for smooth, non-laggy scroll
@@ -339,6 +387,42 @@
             }
         };
 
+        const scrollWomenLeft = () => {
+            if (womenScrollRef.current) {
+                womenScrollRef.current.scrollBy({
+                    left: -280,
+                    behavior: 'smooth'
+                });
+            }
+        };
+
+        const scrollWomenRight = () => {
+            if (womenScrollRef.current) {
+                womenScrollRef.current.scrollBy({
+                    left: 280,
+                    behavior: 'smooth'
+                });
+            }
+        };
+
+        const scrollAccessoriesLeft = () => {
+            if (accessoriesScrollRef.current) {
+                accessoriesScrollRef.current.scrollBy({
+                    left: -280,
+                    behavior: 'smooth'
+                });
+            }
+        };
+
+        const scrollAccessoriesRight = () => {
+            if (accessoriesScrollRef.current) {
+                accessoriesScrollRef.current.scrollBy({
+                    left: 280,
+                    behavior: 'smooth'
+                });
+            }
+        };
+
         const handleCategoryClick = (categoryId) => {
             // Navigate to products page with category filter
             navigate(`/products?category=${categoryId}`);
@@ -462,70 +546,6 @@
                 </div>
 
                 {/* Shop By Category */}
-                <section className="py-16 md:py-24 px-4 md:px-10 max-w-7xl mx-auto w-full">
-                    <div className="flex items-center justify-between mb-10">
-                        <h2 className="text-white text-3xl md:text-4xl font-bold">Curated <span className="text-secondary italic">Categories</span></h2>
-                        <Link to="/collection" className="text-primary hover:text-white text-sm font-medium flex items-center gap-1 transition-colors">
-                            View All <ArrowRight className="w-5 h-5" />
-                        </Link>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Card 1 */}
-                        <Link to="/products" className="group relative aspect-[3/4] md:aspect-[4/5] overflow-hidden rounded-xl cursor-pointer">
-                            <div
-                                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                                data-alt="Groom wearing golden sherwani"
-                                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuB6gvJ3mF4qGeDRW2TEUgBYzo2iFUVIM-ex8OJJcRymLnK_MD4sqydXqzo3Lpi97pOAbgZPTVKT9R2Iuy2gdeQmWGEHyU6AURMTmqf16F5MB46kxG6prcVWzAvH0hApWGJtiLHDIhsjGcNFG6pRYYT0NfxtVSgC00jq0Fwh5IYltF7X5LAKcxoMjvW7JfabFDBlHAHTCWXVWUkQ2jl49EI7MI7W1bZu1arx7wkalu70UbnnnjQ_rIocCQFZ_JQ5Eu8VySU4DPMDbIg2')" }}
-                            >
-                            </div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                            <div className="absolute bottom-0 left-0 p-6 w-full">
-                                <h3 className="text-white text-2xl font-bold mb-2 font-display">The Royal Groom</h3>
-                                <p className="text-white/70 text-sm mb-4 font-body line-clamp-2">Exquisite Sherwanis crafted with intricate embroidery for your big day.</p>
-                                <span className="inline-flex items-center text-secondary text-sm font-bold uppercase tracking-widest group-hover:translate-x-2 transition-transform">
-                                    Shop Men
-                                    <MoveRight className="ml-1 w-5 h-5" />
-                                </span>
-                            </div>
-                        </Link>
-                        {/* Card 2 */}
-                        <Link to="/collection" className="group relative aspect-[3/4] md:aspect-[4/5] overflow-hidden rounded-xl cursor-pointer md:-mt-8">
-                            <div
-                                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                                data-alt="Bride wearing red and gold lehenga"
-                                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAJ8gYwlydlMbonHTe69RxHJfArQtbHKuSRT3HkGUYtbeOU-TxQv6Of71IdJTOWOKikHc4nurHkwSzj8WYC6iQ2eWfmfUoXLk19FB5erEt0qHhGDBUrY6Je-VhYQmgUejlV5P-Jqz47QrQpJZW9lcuDGIg8MBQW380aAEYUMifEklPG63ZOQTs9EZUWcsJzd2uxVb9wPOyimnUSBjg6UFftad9Vd5vxeO4FmyOlA0KEpIe6MIQxBgeIp2mVZHhb_iCV7sVO0lZIgKD1')" }}
-                            >
-                            </div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                            <div className="absolute bottom-0 left-0 p-6 w-full">
-                                <h3 className="text-white text-2xl font-bold mb-2 font-display">The Radiant Bride</h3>
-                                <p className="text-white/70 text-sm mb-4 font-body line-clamp-2">Timeless Lehengas that blend tradition with contemporary elegance.</p>
-                                <span className="inline-flex items-center text-secondary text-sm font-bold uppercase tracking-widest group-hover:translate-x-2 transition-transform">
-                                    Shop Women
-                                    <MoveRight className="ml-1 w-5 h-5" />
-                                </span>
-                            </div>
-                        </Link>
-                        {/* Card 3 */}
-                        <Link to="/collection" className="group relative aspect-[3/4] md:aspect-[4/5] overflow-hidden rounded-xl cursor-pointer">
-                            <div
-                                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
-                                data-alt="Close up of luxury indian fabric patterns"
-                                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCx2o8DNHr6rlBauLEejAcL6VeSdftpAkVUm9Yhhvnb2m9xVvlittzseGpUfNX5wqmFcgA1E2n7ltcqOuRL58sokHIFpDdDeA_MSDQqdf0SdMDSBgRDjpEoAqaQskZMN4_hy89zHSc4ummH_-Hy-QPHAZW5_QXA6Zyb3j8xl9cNB5JJa_6G1tYXqZs83BoeWkiSRGBis3RpckAEIMgth5mMz6Ah_Mzl9A6umUd7ZcptCqrTXAsw00SGAg4YIpfrV_p7AaN5am0wo5P_')" }}
-                            >
-                            </div>
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                            <div className="absolute bottom-0 left-0 p-6 w-full">
-                                <h3 className="text-white text-2xl font-bold mb-2 font-display">Accessories & More</h3>
-                                <p className="text-white/70 text-sm mb-4 font-body line-clamp-2">Complete your look with our curated collection of ethnic accessories.</p>
-                                <span className="inline-flex items-center text-secondary text-sm font-bold uppercase tracking-widest group-hover:translate-x-2 transition-transform">
-                                    Explore
-                                    <MoveRight className="ml-1 w-5 h-5" />
-                                </span>
-                            </div>
-                        </Link>
-                    </div>
-                </section>
 
                 {/* New Arrivals */}
                 {/* <section className="py-12 bg-surface-dark w-full">
@@ -680,6 +700,162 @@
                     </div>
                 </section>
 
+                {/* Shop for Women */}
+                <section className="py-16 md:py-24 px-4 md:px-10 bg-background-dark w-full">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="flex items-center justify-between mb-12">
+                            <div className="text-center">
+                                <span className="text-primary text-sm font-bold tracking-widest uppercase mb-2 block">Elegance & Style</span>
+                                <h2 className="text-white text-3xl md:text-4xl font-bold">Shop <span className="text-secondary italic">Women</span></h2>
+                                <div className="w-24 h-1 bg-secondary mt-4 rounded-full"></div>
+                            </div>
+                            
+                            {/* Top Right Navigation */}
+                            <div className="hidden md:flex items-center gap-2">
+                                <span className="text-primary text-sm font-bold tracking-widest uppercase">Explore All</span>
+                                <button
+                                    onClick={scrollWomenLeft}
+                                    className="bg-primary hover:bg-secondary text-background-dark p-2 rounded-full transition-colors duration-300 shadow-lg hover:shadow-xl"
+                                    aria-label="Scroll left"
+                                >
+                                    <ChevronLeft className="w-5 h-5" />
+                                </button>
+                                <button
+                                    onClick={scrollWomenRight}
+                                    className="bg-primary hover:bg-secondary text-background-dark p-2 rounded-full transition-colors duration-300 shadow-lg hover:shadow-xl"
+                                    aria-label="Scroll right"
+                                >
+                                    <ChevronRight className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {womenLoading ? (
+                            <div className="flex justify-center items-center py-20">
+                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                            </div>
+                        ) : womenCategories.length > 0 ? (
+                            <div className="relative">
+                                {/* Women Categories Scroll Container */}
+                                <div
+                                    ref={womenScrollRef}
+                                    className="flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth px-4 hide-scrollbar"
+                                >
+                                    {womenCategories.map((category) => (
+                                        <div
+                                            key={category._id}
+                                            onClick={() => handleCategoryClick(category._id)}
+                                            className="flex-shrink-0 snap-start cursor-pointer group"
+                                            data-women-card
+                                        >
+                                            <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl w-[220px] sm:w-[260px] md:w-[300px] h-[280px] sm:h-[320px] md:h-[360px]">
+                                                {/* Category Image */}
+                                                <img
+                                                    src={category.image}
+                                                    alt={category.name}
+                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                />
+                                                {/* Overlay Gradient */}
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                                                {/* Category Name */}
+                                                <div className="absolute inset-0 flex items-end p-4 md:p-6">
+                                                    <div>
+                                                        <h3 className="text-white text-xl md:text-2xl font-bold capitalize">
+                                                            {category.name}
+                                                        </h3>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center py-20 px-4">
+                                <p className="text-white/60 text-lg">No women categories available at the moment</p>
+                            </div>
+                        )}
+                    </div>
+                </section>
+
+                {/* Shop Accessories */}
+                <section className="py-16 md:py-24 px-4 md:px-10 bg-background-dark w-full">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="flex items-center justify-between mb-12">
+                            <div className="text-center">
+                                <span className="text-primary text-sm font-bold tracking-widest uppercase mb-2 block">Complete Your Look</span>
+                                <h2 className="text-white text-3xl md:text-4xl font-bold">Shop <span className="text-secondary italic">Accessories</span></h2>
+                                <div className="w-24 h-1 bg-secondary mt-4 rounded-full"></div>
+                            </div>
+                            
+                            {/* Top Right Navigation */}
+                            <div className="hidden md:flex items-center gap-2">
+                                <span className="text-primary text-sm font-bold tracking-widest uppercase">Explore All</span>
+                                <button
+                                    onClick={scrollAccessoriesLeft}
+                                    className="bg-primary hover:bg-secondary text-background-dark p-2 rounded-full transition-colors duration-300 shadow-lg hover:shadow-xl"
+                                    aria-label="Scroll left"
+                                >
+                                    <ChevronLeft className="w-5 h-5" />
+                                </button>
+                                <button
+                                    onClick={scrollAccessoriesRight}
+                                    className="bg-primary hover:bg-secondary text-background-dark p-2 rounded-full transition-colors duration-300 shadow-lg hover:shadow-xl"
+                                    aria-label="Scroll right"
+                                >
+                                    <ChevronRight className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {accessoriesLoading ? (
+                            <div className="flex justify-center items-center py-20">
+                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+                            </div>
+                        ) : accessoriesCategories.length > 0 ? (
+                            <div className="relative">
+                                {/* Accessories Categories Scroll Container */}
+                                <div
+                                    ref={accessoriesScrollRef}
+                                    className="flex gap-4 md:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth px-4 hide-scrollbar"
+                                >
+                                    {accessoriesCategories.map((category) => (
+                                        <div
+                                            key={category._id}
+                                            onClick={() => handleCategoryClick(category._id)}
+                                            className="flex-shrink-0 snap-start cursor-pointer group"
+                                            data-accessories-card
+                                        >
+                                            <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl w-[220px] sm:w-[260px] md:w-[300px] h-[280px] sm:h-[320px] md:h-[360px]">
+                                                {/* Category Image */}
+                                                <img
+                                                    src={category.image}
+                                                    alt={category.name}
+                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                />
+                                                {/* Overlay Gradient */}
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                                                {/* Category Name */}
+                                                <div className="absolute inset-0 flex items-end p-4 md:p-6">
+                                                    <div>
+                                                        <h3 className="text-white text-xl md:text-2xl font-bold capitalize">
+                                                            {category.name}
+                                                        </h3>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center py-20 px-4">
+                                <p className="text-white/60 text-lg">No accessories available at the moment</p>
+                            </div>
+                        )}
+                    </div>
+                </section>
+
                 {/* Featured Videos */}
                 <section className="py-16 md:py-24 bg-background-dark w-full overflow-hidden">
                     <div className="max-w-7xl mx-auto">
@@ -799,6 +975,33 @@
                                 <p className="text-white/60 text-lg">No videos available at the moment</p>
                             </div>
                         )}
+                    </div>
+                </section>
+
+                {/* Shop Lifestyle Section */}
+                <section className="relative w-full h-[400px] md:h-[600px] bg-background-dark overflow-hidden">
+                    {/* Background Image with Overlay */}
+                    <div
+                        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+                        style={{
+                            backgroundImage: `linear-gradient(135deg, rgba(16,34,22,0.6) 0%, rgba(16,34,22,0.8) 100%), url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&auto=format&fit=crop&q=60&ixlib=rb-4.1.0')`,
+                        }}
+                    />
+
+                    {/* Content Overlay */}
+                    <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center max-w-4xl mx-auto">
+                        <h2 className="text-white text-3xl md:text-5xl lg:text-6xl font-black leading-tight mb-4 md:mb-6 drop-shadow-lg">
+                            Shop from the comfort of your home
+                        </h2>
+                        <p className="text-white/90 text-base md:text-lg mb-8 md:mb-10 font-light max-w-2xl">
+                            Experience our luxury collection with personalized service. Browse our curated pieces and connect with our style experts.
+                        </p>
+                        <button
+                            onClick={() => navigate('/products')}
+                            className="bg-secondary hover:bg-primary text-background-dark px-8 py-3.5 md:px-10 md:py-4 rounded-full font-bold text-sm md:text-base tracking-wide transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+                        >
+                            Our Collection
+                        </button>
                     </div>
                 </section>
 

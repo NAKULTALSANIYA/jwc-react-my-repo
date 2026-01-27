@@ -94,6 +94,26 @@ class CategoryController {
     }
   }
 
+  async getWomenCategories(req, res, next) {
+    try {
+      const categories = await CategoryService.getWomenCategories();
+      
+      return ApiResponse.success(res, 'Women categories retrieved successfully', { data: categories });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getAccessoriesCategories(req, res, next) {
+    try {
+      const categories = await CategoryService.getAccessoriesCategories();
+      
+      return ApiResponse.success(res, 'Accessories categories retrieved successfully', { data: categories });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getCategoryTree(req, res, next) {
     try {
       const tree = await CategoryService.getCategoryTree();

@@ -21,6 +21,38 @@ export const getHomeOccasions = async () => {
   }
 };
 
+// Get women's categories
+export const getWomenCategories = async () => {
+  try {
+    const response = await axiosInstance.get('/categories/public/women');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching women categories:', error);
+    return {
+      success: false,
+      data: [],
+      error: error.message
+    };
+  }
+};
+
+// Get accessories categories
+export const getAccessoriesCategories = async () => {
+  try {
+    const response = await axiosInstance.get('/categories/public/accessories');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching accessories categories:', error);
+    return {
+      success: false,
+      data: [],
+      error: error.message
+    };
+  }
+};
+
 export default {
-  getHomeOccasions
+  getHomeOccasions,
+  getWomenCategories,
+  getAccessoriesCategories
 };

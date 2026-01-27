@@ -157,9 +157,9 @@ class CategoryService {
 
   async getHomeOccasions() {
     try {
-      // Fetch categories that are displayed on home page, sorted by sequence
+      // Fetch categories with displaySection = 'occasion'
       const categories = await CategoryDAO.findAll(
-        { displayOnHome: true, isActive: true },
+        { displaySection: 'occasion', isActive: true },
         1,
         100
       );
@@ -172,6 +172,48 @@ class CategoryService {
       return sorted;
     } catch (error) {
       logger.error('Get home occasions error:', error);
+      throw error;
+    }
+  }
+
+  async getWomenCategories() {
+    try {
+      // Fetch categories with displaySection = 'women'
+      const categories = await CategoryDAO.findAll(
+        { displaySection: 'women', isActive: true },
+        1,
+        100
+      );
+      
+      // Sort by sequence
+      const sorted = Array.isArray(categories) 
+        ? categories.sort((a, b) => (a.sequence || 0) - (b.sequence || 0))
+        : [];
+      
+      return sorted;
+    } catch (error) {
+      logger.error('Get women categories error:', error);
+      throw error;
+    }
+  }
+
+  async getAccessoriesCategories() {
+    try {
+      // Fetch categories with displaySection = 'accessories'
+      const categories = await CategoryDAO.findAll(
+        { displaySection: 'accessories', isActive: true },
+        1,
+        100
+      );
+      
+      // Sort by sequence
+      const sorted = Array.isArray(categories) 
+        ? categories.sort((a, b) => (a.sequence || 0) - (b.sequence || 0))
+        : [];
+      
+      return sorted;
+    } catch (error) {
+      logger.error('Get accessories categories error:', error);
       throw error;
     }
   }

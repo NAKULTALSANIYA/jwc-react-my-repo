@@ -306,7 +306,7 @@ const Products = () => {
                 ></div>
                 <div className="absolute inset-0 bg-linear-to-t from-background-dark via-background-dark/50 to-transparent"></div>
                 <div className="relative h-full max-w-360 mx-auto px-6 md:px-10 flex flex-col justify-end pb-8 animate-fade-in-up">
-                    <p className="text-secondary uppercase tracking-widest text-xs font-sans font-bold mb-2">Heritage Collection 2024</p>
+                    <p className="text-secondary uppercase tracking-widest text-xs font-sans font-bold mb-2">Heritage Collection</p>
                     <h1 className="text-white text-3xl md:text-5xl font-bold font-display">Exclusive Ethnic Wear</h1>
                 </div>
             </div>

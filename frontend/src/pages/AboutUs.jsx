@@ -21,7 +21,7 @@ const AboutUs = () => {
                         </span>
                     </div>
                     <h1 className="text-5xl md:text-7xl font-black text-white mb-6 leading-tight">
-                        Crafting <span className="italic text-secondary">Timeless Elegance</span> Since 1995
+                        Crafting <span className="italic text-secondary">Timeless Elegance</span> Since 1999
                     </h1>
                     <p className="text-white/70 text-lg md:text-xl max-w-3xl font-light mb-8">
                         At JewelCraft, we believe that ethnic wear is more than just clothing—it's a celebration of heritage, tradition, and personal style. Our journey began with a simple vision: to create the most exquisite Sherwanis and Lehengas that honor our cultural roots while embracing contemporary design.
@@ -36,17 +36,17 @@ const AboutUs = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {[
                             {
-                                year: "1995",
+                                year: "1999",
                                 title: "The Beginning",
                                 description: "Started with a small atelier in New Delhi, crafting custom Sherwanis for family and friends."
                             },
                             {
                                 year: "2005",
-                                title: "National Recognition",
-                                description: "Expanded to 5 stores across major Indian cities and won 'Best Ethnic Wear' award."
+                                title: "Heritage Craftsmanship",
+                                description: "Became renowned for our signature hand-embroidered collections and traditional weaving techniques passed down through generations."
                             },
                             {
-                                year: "2024",
+                                year: "2026",
                                 title: "Digital Revolution",
                                 description: "Launched our online platform to serve clients worldwide while maintaining our handcrafted excellence."
                             }

@@ -29,7 +29,6 @@ const Header = () => {
                         <nav className="hidden lg:flex items-center gap-8 ml-8">
                             <Link to="/" className={`text-sm font-medium transition-colors ${isActive('/') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>Home</Link>
                             <Link to="/Products" className={`text-sm font-medium transition-colors ${isActive('/Products') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>Products</Link>
-                            <Link to="/collection" className={`text-sm font-medium transition-colors ${isActive('/collection') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>Collection</Link>
                             <Link to="/new-arrivals" className={`text-sm font-medium transition-colors ${isActive('/new-arrivals') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>New Arrivals</Link>
                             <Link to="/about-us" className={`text-sm font-medium transition-colors ${isActive('/about-us') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>About Us</Link>
                             <Link to="/contact-us" className={`text-sm font-medium transition-colors ${isActive('/contact-us') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>Contact Us</Link>
@@ -84,7 +83,6 @@ const Header = () => {
                                 <div className="flex flex-col gap-4">
                                     <Link to="/" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>Home</Link>
                                     <Link to="/Products" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/Products') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>Products</Link>
-                                    <Link to="/collection" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/collection') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>Collection</Link>
                                     <Link to="/new-arrivals" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/new-arrivals') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>New Arrivals</Link>
                                     <Link to="/about-us" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/about-us') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>About Us</Link>
                                     <Link to="/contact-us" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/contact-us') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>Contact Us</Link>
@@ -117,23 +115,14 @@ const Footer = () => {
                     <div className="col-span-1 md:col-span-1">
                         <div className="flex items-center gap-2 text-secondary mb-4">
                             <Gem className="w-5 h-5" />
-                            <span className="text-lg font-bold">Jalaram Couture</span>
+                            <span className="text-lg font-bold">Jalaram Wedding Couture</span>
                         </div>
                         <p className="text-white/50 text-sm font-body leading-relaxed">
-                            Crafting memories with threads of tradition since 1995. We bring you the finest ethnic wear for your special occasions.
+                            Crafting memories with threads of tradition since 1999. We bring you the finest ethnic wear for your special occasions.
                         </p>
                     </div>
 
                     {/* Shop */}
-                    <div>
-                        <h4 className="text-white font-bold mb-4">Shop</h4>
-                        <ul className="space-y-2 text-sm text-white/60 font-body">
-                            <li><Link to="/products" className="hover:text-primary transition-colors">Men's Collection</Link></li>
-                            <li><Link to="/collection" className="hover:text-primary transition-colors">Women's Collection</Link></li>
-                            <li><Link to="/collection" className="hover:text-primary transition-colors">Wedding Special</Link></li>
-                            <li><Link to="/collection" className="hover:text-primary transition-colors">Accessories</Link></li>
-                        </ul>
-                    </div>
 
                     {/* Help */}
                     <div>
@@ -157,11 +146,11 @@ const Footer = () => {
                             </li>
                             <li className="flex items-center gap-3">
                                 <Phone size={20} className="text-lg" />
-                                <span>+91 98765 43210</span>
+                                <span>+91 99987 17666</span>
                             </li>
                             <li className="flex items-center gap-3">
-                                <Mail size={20} className="text-lg" />
-                                <span>support@jalaramcouture.com</span>
+                                <Mail size={20} className="text-white/60 flex-shrink-0" />
+                                <span>jalaramweddingcouture8789@gmail.com</span>
                             </li>
                         </ul>
                     </div>

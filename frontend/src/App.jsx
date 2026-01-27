@@ -8,7 +8,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import GuestOnlyRoute from './components/GuestOnlyRoute';
 import Home from './pages/Home';
 import Products from './pages/Products';
-import Collection from './pages/Collection';
 import Login from './pages/Login';
 import Cart from './pages/Cart';
 import Register from './pages/Register';
@@ -32,7 +31,6 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="Products" element={<Products />} />
-            <Route path="collection" element={<Collection />} />
             <Route path="new-arrivals" element={<NewArrivals />} />
             <Route path="contact-us" element={<ContactUs />} />
             <Route path="about-us" element={<AboutUs />} />

@@ -29,8 +29,11 @@ const Categories = () => {
         description: '',
         image: '',
         imageUrl: '',
+        seoTitle: '',
+        seoDescription: '',
         isActive: true,
         displayOnHome: false,
+        displaySection: 'none',
         sequence: 0
     });
 
@@ -66,11 +69,21 @@ const Categories = () => {
         setSaving(true);
         
         try {
+            // Map seoTitle/seoDescription to metaTitle/metaDescription for backend
+            const categoryData = {
+                ...formData,
+                metaTitle: formData.seoTitle,
+                metaDescription: formData.seoDescription
+            };
+            // Remove the seo fields as backend doesn't expect them
+            delete categoryData.seoTitle;
+            delete categoryData.seoDescription;
+
             if (editingId) {
-                await adminApi.updateCategory(editingId, formData);
+                await adminApi.updateCategory(editingId, categoryData);
                 showSuccess('Category updated successfully');
             } else {
-                await adminApi.createCategory(formData);
+                await adminApi.createCategory(categoryData);
                 showSuccess('Category created successfully');
             }
             
@@ -91,8 +104,11 @@ const Categories = () => {
             description: category.description || '',
             image: category.image || '',
             imageUrl: category.imageUrl || '',
+            seoTitle: category.metaTitle || '',
+            seoDescription: category.metaDescription || '',
             isActive: category.isActive !== false,
             displayOnHome: category.displayOnHome || false,
+            displaySection: category.displaySection || 'none',
             sequence: category.sequence || 0
         });
         setShowModal(true);
@@ -124,6 +140,7 @@ const Categories = () => {
             seoDescription: '',
             isActive: true,
             displayOnHome: false,
+            displaySection: 'none',
             sequence: 0
         });
         setEditingId(null);
@@ -404,6 +421,24 @@ const Categories = () => {
                                         <span className="text-sm font-medium text-slate-700">Display on Home Page</span>
                                     </label>
                                     <p className="text-xs text-slate-500">Show this occasion in the "Shop by Occasion" section</p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                        Display Section
+                                    </label>
+                                    <select
+                                        name="displaySection"
+                                        value={formData.displaySection}
+                                        onChange={handleInputChange}
+                                        className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
+                                    >
+                                        <option value="none">None (Don't Display)</option>
+                                        <option value="occasion">Shop by Occasion</option>
+                                        <option value="women">Shop Women</option>
+                                        <option value="accessories">Shop Accessories</option>
+                                    </select>
+                                    <p className="text-xs text-slate-500 mt-1">Choose which home page section to display this category</p>
                                 </div>
                             </div>
 

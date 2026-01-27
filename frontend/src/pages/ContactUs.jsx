@@ -92,8 +92,8 @@ const ContactUs = () => {
                                 </div>
                                 <h3 className="text-white font-bold text-xl mb-2">Email Us</h3>
                                 <p className="text-white/60 mb-4">We respond within 24 hours</p>
-                                <a href="mailto:support@jewelcraft.com" className="text-primary hover:text-secondary transition-colors font-semibold">
-                                    support@jewelcraft.com
+                                <a href="mailto:jalaramweddingcouture8789@gmail.com" className="text-primary hover:text-secondary transition-colors font-semibold">
+                                    jalaramweddingcouture8789@gmail.com
                                 </a>
                             </div>
                         </div>
@@ -107,8 +107,8 @@ const ContactUs = () => {
                                 </div>
                                 <h3 className="text-white font-bold text-xl mb-2">Call Us</h3>
                                 <p className="text-white/60 mb-4">Mon - Fri, 10AM - 6PM IST</p>
-                                <a href="tel:+919876543210" className="text-secondary hover:text-primary transition-colors font-semibold">
-                                    +91 98765 43210
+                                <a href="tel:+919998717666" className="text-secondary hover:text-primary transition-colors font-semibold">
+                                    +91 99987 17666
                                 </a>
                             </div>
                         </div>

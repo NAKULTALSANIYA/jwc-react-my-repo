@@ -46,6 +46,12 @@ const categorySchema = new mongoose.Schema({
     default: false,
     description: 'Whether this occasion category should be displayed on the home page'
   },
+  displaySection: {
+    type: String,
+    enum: ['occasion', 'women', 'accessories', 'none'],
+    default: 'none',
+    description: 'Which home page section to display this category in'
+  },
   sequence: {
     type: Number,
     default: 0,
@@ -82,6 +88,7 @@ categorySchema.index({ parent: 1 });
 categorySchema.index({ level: 1 });
 categorySchema.index({ isActive: 1 });
 categorySchema.index({ displayOnHome: 1, sequence: 1 });
+categorySchema.index({ displaySection: 1, isActive: 1 });
 
 // Generate slug before saving
 categorySchema.pre('save', async function(next) {

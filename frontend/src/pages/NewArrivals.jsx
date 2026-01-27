@@ -66,7 +66,7 @@ const NewArrivals = () => {
                     }}
                 ></div>
                 <div className="relative h-full max-w-[1440px] mx-auto px-6 md:px-10 flex flex-col justify-end pb-12 animate-fade-in-up">
-                    <p className="text-secondary uppercase tracking-widest text-xs font-sans font-bold mb-2">Fresh Arrivals 2024</p>
+                    <p className="text-secondary uppercase tracking-widest text-xs font-sans font-bold mb-2">Fresh Arrivals</p>
                     <h1 className="text-white text-4xl md:text-6xl font-bold font-display">New Arrivals</h1>
                     <p className="text-[#9db9a6] text-base md:text-lg mt-3 max-w-2xl">Discover our latest collection of handcrafted ethnic wear, designed to make your special moments unforgettable.</p>
                 </div>
