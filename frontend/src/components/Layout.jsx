@@ -128,8 +128,6 @@ const Footer = () => {
                     <div>
                         <h4 className="text-white font-bold mb-4">Help</h4>
                         <ul className="space-y-2 text-sm text-white/60 font-body">
-                            <li><Link to="#" className="hover:text-primary transition-colors">Track Order</Link></li>
-                            <li><Link to="#" className="hover:text-primary transition-colors">Returns & Exchanges</Link></li>
                             <li><Link to="#" className="hover:text-primary transition-colors">Size Guide</Link></li>
                             <li><Link to="/about-us" className="hover:text-primary transition-colors">About Us</Link></li>
                             <li><Link to="/contact-us" className="hover:text-primary transition-colors">Contact Us</Link></li>
