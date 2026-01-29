@@ -51,23 +51,19 @@
         const heroSlides = [
             // Royal Velvet Sherwani (men's statement look)
             {
-                image:
-                    'https://images.unsplash.com/photo-1634410251313-b65c51944ab3?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8ZXRobmljJTIwd2VhciUyMG1vZGVsfGVufDB8fDB8fHww',
+                image: '/hero01.jpeg',
             },
             // Rose Gold Lehenga (bridal elegance)
             {
-                image:
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuAWaCdYmz-1jTTwUitgQMMXa6QRo_3pZtAv--_D9uLeKVuYXa9tKb2dDJbYfTO6kQeopYEH98yX4jbw9ljYUBD5Zs6fHrSasFnhiNM4uCcF4WcMyGpqqrsFTCYrbyKejAiuSJYSOTp2_vp43IYBXYY4AhsdPAu1AY81L3E7FFmQWpaAHhDIoZ8kqIUqZlspOF7b3ShkXM8Aj9ABSaQIaK1HZmUJCHqQ7n3DuOzp3v0hROP4tbmbbY19WXwVa5NEh9GF10EfZ3qMRbO1',
+                image: '/hero02.jpeg',
             },
             // Emerald Silk Kurta (festive menswear)
             {
-                image:
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuCcmlNIfurHW1G8sYYQmyvmqCQg6Yote8Qhezo4MiMM6B5xhZPXk2ZvFmSEZzL2YVQiI9QIfaPempVM7BDX-lIQp46LrFWQ9pMhQ0ogCMtlEwZPIZxbWkhzSWPa0HyVk3AKOyeIm7gp2VwrdxQz5n79un5Zlblm_A5xkud7EU_E3ti8MmA-Ziv2GTt5S1MYXF2KE0mYFpmShKRjs9ErsdCNwdwFSpg2XqJV9HiOp2hGV7zRLWz-4ingZ_WI1LHkQd8py68CxtbmXEBX',
+                image: '/hero03.jpeg',
             },
             // Golden Banarasi Saree (heritage womenswear)
             {
-                image:
-                    'https://lh3.googleusercontent.com/aida-public/AB6AXuAVPXtF3Mt1cU9pDeCWSDkr2bMm0Z23Cm-CHUP8qNzolE-_QuG6lyigY6qUsErA4jtlVz9PA8Pik2JgNYQOM0uWeYs2l948_Glh1bEkgX0YEJ7jn_aoRGbTEVsYtGTAciQudkcGCgnsELaq9L-QJq0TFTOh4XAjwzjAfLE42U-2Xm0WCR6Lb4ycem6oQPmmNQ703UxR79I8grb25p3yGUETAYUST3k3MnFUkqhiv3Icr4EDDHFhqFp20EKpOn7N_tt3w_Q38rCvBE1D',
+                image: '/hero04.jpeg',
             },
         ];
 
