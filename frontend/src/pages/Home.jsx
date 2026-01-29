@@ -2,6 +2,7 @@
     import { Link, useNavigate } from 'react-router-dom';
     import { Shirt, Gem, Truck, ShieldCheck, ArrowRight, MoveRight, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
     import VideoModal from '../components/VideoModal';
+    import CircularGallery from '../components/CircularGallery';
     import { getVideos } from '../api/services/video.service';
     import { getHomeOccasions, getWomenCategories, getAccessoriesCategories } from '../api/services/occasion.service';
 
@@ -998,6 +999,30 @@
                         >
                             Our Collection
                         </button>
+                    </div>
+                </section>
+
+                {/* Circular Gallery Section */}
+                <section className="py-16 md:py-24 px-4 md:px-10 bg-background-dark w-full">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center mb-12">
+                            <span className="text-primary text-sm font-bold tracking-widest uppercase mb-2 block">Interactive Showcase</span>
+                            <h2 className="text-white text-3xl md:text-4xl font-bold">Gallery Experience</h2>
+                            <div className="w-24 h-1 bg-secondary mx-auto mt-4 rounded-full"></div>
+                            <p className="text-white/70 text-sm md:text-base mt-4 max-w-2xl mx-auto">
+                                Drag or scroll to explore our collection with stunning 3D effects
+                            </p>
+                        </div>
+                        
+                        <div className="w-full h-[400px] sm:h-[500px] md:h-[600px] relative rounded-xl md:rounded-2xl overflow-hidden shadow-2xl">
+                            <CircularGallery
+                                bend={2}
+                                textColor="#ffffff"
+                                borderRadius={0.05}
+                                scrollEase={0.05}
+                                scrollSpeed={1.5}
+                            />
+                        </div>
                     </div>
                 </section>
 
