@@ -15,7 +15,7 @@ class CategoryController {
 
   async getAllCategories(req, res, next) {
     try {
-      const { page = 1, limit = 10, isActive } = req.query;
+      const { page = 1, limit = 200, isActive } = req.query;
       
       const filters = {};
       if (isActive !== undefined) filters.isActive = isActive === 'true';
