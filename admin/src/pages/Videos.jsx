@@ -76,9 +76,9 @@ const Videos = () => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Check file size (max 100MB)
-      if (file.size > 100 * 1024 * 1024) {
-        toast.error('Video file size must be less than 100MB');
+      // Check file size (max 300MB)
+      if (file.size > 300 * 1024 * 1024) {
+        toast.error('Video file size must be less than 300MB');
         return;
       }
       setVideoFile(file);
@@ -282,7 +282,7 @@ const Videos = () => {
               ) : (
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Upload Video File {!formData.url && '*'} (Max 100MB)
+                    Upload Video File {!formData.url && '*'} (Max 300MB)
                   </label>
                   {formData.url && !videoFile && (
                     <div className="mb-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-700">
