@@ -22,15 +22,7 @@ class CareerController {
         throw new ApiError(400, 'Resume file is required');
       }
 
-      // Check for recent applications from same email (allow one per day)
-      const recentApplication = await Career.findOne({
-        email,
-        createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
-      });
-
-      if (recentApplication) {
-        throw new ApiError(429, 'You can only submit one application per day. Please try again later.');
-      }
+      // NOTE: Removed per-day submission limit to allow multiple applications per day.
 
       const career = await Career.create({
         name,
