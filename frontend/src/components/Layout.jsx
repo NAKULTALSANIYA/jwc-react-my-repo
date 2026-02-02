@@ -31,6 +31,7 @@ const Header = () => {
                             <Link to="/Products" className={`text-sm font-medium transition-colors ${isActive('/Products') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>Products</Link>
                             <Link to="/new-arrivals" className={`text-sm font-medium transition-colors ${isActive('/new-arrivals') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>New Arrivals</Link>
                             <Link to="/about-us" className={`text-sm font-medium transition-colors ${isActive('/about-us') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>About Us</Link>
+                            <Link to="/careers" className={`text-sm font-medium transition-colors ${isActive('/careers') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>Careers</Link>
                             <Link to="/contact-us" className={`text-sm font-medium transition-colors ${isActive('/contact-us') ? 'text-secondary' : 'text-white/80 hover:text-secondary'}`}>Contact Us</Link>
                         </nav>
                     </div>
@@ -85,6 +86,7 @@ const Header = () => {
                                     <Link to="/Products" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/Products') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>Products</Link>
                                     <Link to="/new-arrivals" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/new-arrivals') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>New Arrivals</Link>
                                     <Link to="/about-us" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/about-us') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>About Us</Link>
+                                    <Link to="/careers" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/careers') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>Careers</Link>
                                     <Link to="/contact-us" onClick={() => setMobileMenuOpen(false)} className={`text-base font-medium transition-colors py-2 ${isActive('/contact-us') ? 'text-secondary' : 'text-white hover:text-secondary'}`}>Contact Us</Link>
                                 </div>
                             </nav>
@@ -130,6 +132,7 @@ const Footer = () => {
                         <ul className="space-y-2 text-sm text-white/60 font-body">
                             <li><Link to="#" className="hover:text-primary transition-colors">Size Guide</Link></li>
                             <li><Link to="/about-us" className="hover:text-primary transition-colors">About Us</Link></li>
+                            <li><Link to="/careers" className="hover:text-primary transition-colors">Careers</Link></li>
                             <li><Link to="/contact-us" className="hover:text-primary transition-colors">Contact Us</Link></li>
                         </ul>
                     </div>

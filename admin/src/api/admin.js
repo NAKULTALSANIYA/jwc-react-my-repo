@@ -63,6 +63,12 @@ export const adminApi = {
   addAdminNotes: (id, payload) => apiClient.patch(`/api/contact/${id}/notes`, payload),
   deleteContact: (id) => apiClient.del(`/api/contact/${id}`),
 
+  // Careers
+  getCareers: (params = {}) => apiClient.get(`/api/careers${toQuery(params)}`),
+  getCareerStats: () => apiClient.get('/api/careers/stats'),
+  approveCareer: (id, payload) => apiClient.patch(`/api/careers/${id}/approve`, payload),
+  rejectCareer: (id, payload) => apiClient.patch(`/api/careers/${id}/reject`, payload),
+
   // Videos
   videos: (params = {}) => apiClient.get(`/api/videos${toQuery(params)}`),
   getVideo: (id) => apiClient.get(`/api/videos/${id}`),

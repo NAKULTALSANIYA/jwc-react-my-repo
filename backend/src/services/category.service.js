@@ -1,4 +1,3 @@
-
 import CategoryDAO from '../dao/category.dao.js';
 import ApiError from '../utils/ApiError.js';
 import { logger } from '../utils/logger.js';
@@ -7,7 +6,7 @@ class CategoryService {
   async createCategory(categoryData) {
     try {
       // Check if category with same name or slug exists
-      const existingCategory = await CategoryDAO.findAll({ 
+      const existingCategory = await CategoryDAO.findAll({
         $or: [
           { name: categoryData.name },
           { slug: categoryData.slug }
@@ -133,8 +132,8 @@ class CategoryService {
         throw new ApiError(404, 'Category not found');
       }
 
-      const updatedCategory = await CategoryDAO.updateById(categoryId, { 
-        isActive: !category.isActive 
+      const updatedCategory = await CategoryDAO.updateById(categoryId, {
+        isActive: !category.isActive
       });
 
       logger.info(`Category status toggled: ${updatedCategory.name} - ${updatedCategory.isActive ? 'active' : 'inactive'}`);
@@ -163,12 +162,12 @@ class CategoryService {
         1,
         100
       );
-      
+
       // Sort by sequence
-      const sorted = Array.isArray(categories) 
+      const sorted = Array.isArray(categories)
         ? categories.sort((a, b) => (a.sequence || 0) - (b.sequence || 0))
         : [];
-      
+
       return sorted;
     } catch (error) {
       logger.error('Get home occasions error:', error);
@@ -184,12 +183,12 @@ class CategoryService {
         1,
         100
       );
-      
+
       // Sort by sequence
-      const sorted = Array.isArray(categories) 
+      const sorted = Array.isArray(categories)
         ? categories.sort((a, b) => (a.sequence || 0) - (b.sequence || 0))
         : [];
-      
+
       return sorted;
     } catch (error) {
       logger.error('Get women categories error:', error);
@@ -205,12 +204,12 @@ class CategoryService {
         1,
         100
       );
-      
+
       // Sort by sequence
-      const sorted = Array.isArray(categories) 
+      const sorted = Array.isArray(categories)
         ? categories.sort((a, b) => (a.sequence || 0) - (b.sequence || 0))
         : [];
-      
+
       return sorted;
     } catch (error) {
       logger.error('Get accessories categories error:', error);

@@ -28,6 +28,7 @@ import dashboardRoutes from './routes/dashboard.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 import videoRoutes from './routes/video.routes.js';
+import careerRoutes from './routes/career.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -180,6 +181,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/videos', videoRoutes);
+app.use('/api/careers', careerRoutes);
 
 
 // Handle 404 routes

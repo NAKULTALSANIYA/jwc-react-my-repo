@@ -10,6 +10,7 @@ import Orders from './pages/Orders';
 import OrderDetail from './pages/OrderDetail';
 import Contacts from './pages/Contacts';
 import Videos from './pages/Videos';
+import Careers from './pages/Careers';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import ProtectedLayout from './components/ProtectedLayout';
@@ -33,6 +34,7 @@ function App() {
               <Route path="/order-detail/:orderId" element={<OrderDetail />} />
               <Route path="/customers" element={<Customers />} />
               <Route path="/contacts" element={<Contacts />} />
+              <Route path="/careers" element={<Careers />} />
               <Route path="/videos" element={<Videos />} />
             </Route>
           </Route>

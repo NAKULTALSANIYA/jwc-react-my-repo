@@ -19,6 +19,7 @@ import Profile from './pages/Profile';
 import OrderSuccess from './pages/OrderSuccess';
 import ContactUs from './pages/ContactUs';
 import AboutUs from './pages/AboutUs';
+import Careers from './pages/Careers';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
             <Route path="Products" element={<Products />} />
             <Route path="new-arrivals" element={<NewArrivals />} />
             <Route path="contact-us" element={<ContactUs />} />
+            <Route path="careers" element={<Careers />} />
             <Route path="about-us" element={<AboutUs />} />
             <Route path="cart" element={<Cart />} />
             <Route path="checkout" element={<Checkout />} />

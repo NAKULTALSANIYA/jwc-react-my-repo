@@ -197,6 +197,95 @@ Jalaram Wedding Collection Team
       return false;
     }
   }
+
+  /**
+   * Send career application status email
+   */
+  async sendCareerStatusEmail({ email, name, role, status, responseMessage }) {
+    const normalizedStatus = status === 'approved' ? 'approved' : 'rejected';
+    const subject = normalizedStatus === 'approved'
+      ? 'Your Career Application has been Approved'
+      : 'Update on Your Career Application';
+
+    const text = `
+Hi ${name},
+
+Thank you for your interest in the ${role} role at Jalaram Wedding Collection.
+
+Status: ${normalizedStatus.toUpperCase()}
+
+Message from our team:
+${responseMessage}
+
+Best regards,
+Jalaram Wedding Collection Team
+    `;
+
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Career Application Update</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+    <tr>
+      <td style="padding: 40px 0;">
+        <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" width="100%" cellspacing="0" cellpadding="0" border="0">
+          <tr>
+            <td style="background: linear-gradient(135deg, #0dc93c 0%, #0bc038 100%); padding: 30px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: bold;">Application Update</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 30px;">
+              <h2 style="margin: 0 0 16px; color: #1a261e; font-size: 20px; font-weight: bold;">Hi ${name},</h2>
+              <p style="margin: 0 0 16px; color: #3b5441; font-size: 15px; line-height: 1.6;">
+                Thank you for your interest in the <strong>${role}</strong> role at Jalaram Wedding Collection.
+              </p>
+              <p style="margin: 0 0 16px; color: #3b5441; font-size: 15px; line-height: 1.6;">
+                <strong>Status:</strong> ${normalizedStatus.toUpperCase()}
+              </p>
+              <div style="background-color: #f8faf9; border: 1px solid #dfe8e3; border-radius: 8px; padding: 16px; margin: 16px 0;">
+                <p style="margin: 0 0 8px; color: #3b5441; font-size: 14px; font-weight: bold;">Message from our team</p>
+                <p style="margin: 0; color: #3b5441; font-size: 14px; line-height: 1.6; white-space: pre-line;">${responseMessage}</p>
+              </div>
+              <p style="margin: 0; color: #3b5441; font-size: 14px; line-height: 1.6;">
+                If you have any questions, feel free to reply to this email.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #1a261e; padding: 24px; text-align: center;">
+              <p style="margin: 0; color: #9db9a6; font-size: 12px;">
+                Best regards,<br>
+                <strong>Jalaram Wedding Collection Team</strong>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `;
+
+    try {
+      const sent = await sendEmail({ to: email, subject, text, html });
+      if (sent) {
+        logger.info(`Career status email sent to: ${email}`);
+        return true;
+      }
+      logger.warn(`Failed to send career status email to: ${email}`);
+      return false;
+    } catch (error) {
+      logger.error(`Error sending career status email to ${email}:`, error);
+      return false;
+    }
+  }
 }
 
 export default new EmailService();
