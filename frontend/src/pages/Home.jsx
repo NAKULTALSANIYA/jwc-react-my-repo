@@ -60,7 +60,7 @@ const Home = () => {
         const fetchHeroes = async () => {
             try {
                 setHeroLoading(true);
-                const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/heroes`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/heroes`);
                 const data = await response.json();
                 const heroes = Array.isArray(data) ? data : data?.data || [];
                 
