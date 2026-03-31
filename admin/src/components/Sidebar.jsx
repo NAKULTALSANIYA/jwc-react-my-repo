@@ -12,7 +12,8 @@ import {
     ChevronRight,
     X,
     Tag,
-    Video
+    Video,
+    Image
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth.jsx';
 
@@ -25,6 +26,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/' },
         { name: 'Products', icon: <ShoppingBag size={20} />, path: '/products' },
         { name: 'Categories', icon: <Tag size={20} />, path: '/categories' },
+        { name: 'Hero Images', icon: <Image size={20} />, path: '/hero-images' },
         { name: 'Videos', icon: <Video size={20} />, path: '/videos' },
         { name: 'Orders', icon: <ShoppingCart size={20} />, path: '/orders' },
         { name: 'Customers', icon: <Users size={20} />, path: '/customers' },

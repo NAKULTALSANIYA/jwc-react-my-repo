@@ -734,9 +734,10 @@ const AddEditProduct = () => {
                                     <button
                                         type="button"
                                         onClick={() => removeImage(index)}
-                                        className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                        className="absolute top-1 right-1 p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-full opacity-80 hover:opacity-100 transition-all shadow-md active:scale-95"
+                                        title="Remove image"
                                     >
-                                        <X size={14} />
+                                        <X size={16} />
                                     </button>
                                     {image.isPrimary && (
                                         <span className="absolute bottom-2 left-2 px-2 py-0.5 bg-blue-600 text-white text-xs rounded">

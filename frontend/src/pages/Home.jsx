@@ -47,32 +47,56 @@ const Home = () => {
     const heroTouchStartRef = useRef({ x: 0, y: 0 });
     const heroMouseStartRef = useRef({ x: 0, y: 0 });
 
-    // Hero slider: images + autoplay + manual controls
-    const heroSlides = [
-        // Royal Velvet Sherwani (men's statement look)
-        {
-            image: '/hero01.jpeg',
-        },
-        // Rose Gold Lehenga (bridal elegance)
-        {
-            image: '/hero02.jpeg',
-        },
-        // Emerald Silk Kurta (festive menswear)
-        {
-            image: '/hero03.jpeg',
-        },
-        // Golden Banarasi Saree (heritage womenswear)
-        {
-            image: '/hero04.jpeg',
-        },
-    ];
+    // Hero slider: images from API
+    const [heroSlides, setHeroSlides] = useState([]);
+    const [heroLoading, setHeroLoading] = useState(true);
 
     const [heroIndex, setHeroIndex] = useState(0);
     const [heroPaused, setHeroPaused] = useState(false);
     const heroTimerRef = useRef(null);
 
+    // Fetch hero images from API
     useEffect(() => {
-        if (heroPaused) return;
+        const fetchHeroes = async () => {
+            try {
+                setHeroLoading(true);
+                const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/heroes`);
+                const data = await response.json();
+                const heroes = Array.isArray(data) ? data : data?.data || [];
+                
+                // Filter by isActive and sort by position
+                const activeHeroes = heroes
+                    .filter(h => h.isActive !== false)
+                    .sort((a, b) => a.position - b.position)
+                    .map(h => ({
+                        image: h.imageUrl,
+                    }));
+                
+                setHeroSlides(activeHeroes.length > 0 ? activeHeroes : [
+                    { image: '/hero01.jpeg' },
+                    { image: '/hero02.jpeg' },
+                    { image: '/hero03.jpeg' },
+                    { image: '/hero04.jpeg' },
+                ]);
+            } catch (error) {
+                console.error('Error fetching hero images:', error);
+                // Fallback to default images
+                setHeroSlides([
+                    { image: '/hero01.jpeg' },
+                    { image: '/hero02.jpeg' },
+                    { image: '/hero03.jpeg' },
+                    { image: '/hero04.jpeg' },
+                ]);
+            } finally {
+                setHeroLoading(false);
+            }
+        };
+
+        fetchHeroes();
+    }, []);
+
+    useEffect(() => {
+        if (heroPaused || heroSlides.length === 0) return;
         heroTimerRef.current = setInterval(() => {
             setHeroIndex((i) => (i + 1) % heroSlides.length);
         }, 6000);
@@ -82,13 +106,21 @@ const Home = () => {
     }, [heroPaused, heroSlides.length]);
 
     const prevHero = useCallback(
-        () => setHeroIndex((i) => (i - 1 + heroSlides.length) % heroSlides.length),
+        () => {
+            if (heroSlides.length === 0) return;
+            setHeroIndex((i) => (i - 1 + heroSlides.length) % heroSlides.length);
+        },
         [heroSlides.length]
     );
     const nextHero = useCallback(
-        () => setHeroIndex((i) => (i + 1) % heroSlides.length),
+        () => {
+            if (heroSlides.length === 0) return;
+            setHeroIndex((i) => (i + 1) % heroSlides.length);
+        },
         [heroSlides.length]
     );
+
+    const currentHero = heroSlides[heroIndex] || null;
 
     // Keyboard navigation for hero
     useEffect(() => {
@@ -453,14 +485,14 @@ const Home = () => {
                 {/* Content overlay */}
                 <div className="relative z-10 flex flex-col items-start justify-center h-full px-4 md:px-10 text-left max-w-5xl mx-auto">
                     {/* <span className="text-secondary tracking-[0.2em] uppercase text-xs md:text-sm font-medium mb-3">Heritage & Luxury</span> */}
-                    {heroSlides[heroIndex].headline && (
+                    {currentHero?.headline && (
                         <h1 className="text-white text-4xl md:text-6xl font-black leading-tight tracking-tight mb-4 drop-shadow-lg">
-                            {heroSlides[heroIndex].headline}
+                            {currentHero.headline}
                         </h1>
                     )}
-                    {heroSlides[heroIndex].sub && (
+                    {currentHero?.sub && (
                         <p className="text-white/90 text-base md:text-lg max-w-xl mb-8 font-light font-body">
-                            {heroSlides[heroIndex].sub}
+                            {currentHero.sub}
                         </p>
                     )}
                     <div className="flex gap-4">

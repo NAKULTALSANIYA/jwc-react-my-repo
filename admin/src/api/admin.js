@@ -75,11 +75,66 @@ export const adminApi = {
   createVideo: (payload) => apiClient.post('/api/videos', payload),
   updateVideo: (id, payload) => apiClient.put(`/api/videos/${id}`, payload),
   deleteVideo: (id) => apiClient.del(`/api/videos/${id}`),
-  uploadVideo: (file) => {
-    const formData = new FormData();
-    formData.append('video', file);
-    return apiClient.post('/api/videos/upload', formData);
+  uploadVideo: (file, onProgress = null) => {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append('video', file);
+
+      const xhr = new XMLHttpRequest();
+
+      // Track upload progress
+      if (onProgress) {
+        xhr.upload.addEventListener('progress', (e) => {
+          if (e.lengthComputable) {
+            const percentage = Math.round((e.loaded / e.total) * 100);
+            onProgress(percentage);
+          }
+        });
+      }
+
+      xhr.addEventListener('load', () => {
+        if (xhr.status === 200 || xhr.status === 201) {
+          try {
+            const response = JSON.parse(xhr.responseText);
+            resolve(response.data || response);
+          } catch (e) {
+            reject(new Error('Invalid response format'));
+          }
+        } else {
+          try {
+            const error = JSON.parse(xhr.responseText);
+            reject(new Error(error.message || 'Upload failed'));
+          } catch (e) {
+            reject(new Error(`Upload failed with status ${xhr.status}`));
+          }
+        }
+      });
+
+      xhr.addEventListener('error', () => {
+        reject(new Error('Network error during upload'));
+      });
+
+      xhr.addEventListener('abort', () => {
+        reject(new Error('Upload cancelled'));
+      });
+
+      const token = localStorage.getItem('token');
+      xhr.open('POST', '/api/videos/upload');
+      if (token) {
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+      }
+
+      xhr.send(formData);
+    });
   },
+
+  // Hero Images
+  getHeroes: (params = {}) => apiClient.get(`/api/heroes${toQuery(params)}`),
+  getHero: (position) => apiClient.get(`/api/heroes/${position}`),
+  createHero: (payload) => apiClient.post('/api/heroes', payload),
+  updateHero: (position, payload) => apiClient.put(`/api/heroes/${position}`, payload),
+  deleteHero: (position) => apiClient.del(`/api/heroes/${position}`),
+  updateHeroStatus: (position, isActive) => apiClient.patch(`/api/heroes/${position}/status`, { isActive }),
 };
 
 export { toQuery };

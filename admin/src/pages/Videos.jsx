@@ -13,6 +13,7 @@ const Videos = () => {
   const [uploadType, setUploadType] = useState('url'); // 'url' or 'file'
   const [videoFile, setVideoFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const toast = useToast();
   
   const [formData, setFormData] = useState({
@@ -93,19 +94,24 @@ const Videos = () => {
 
     try {
       setIsUploading(true);
-      const uploaded = await adminApi.uploadVideo(videoFile);
+      setUploadProgress(0);
+      const uploaded = await adminApi.uploadVideo(videoFile, (progress) => {
+        setUploadProgress(progress);
+      });
 
       if (uploaded && uploaded.url) {
         setFormData(prev => ({ ...prev, url: uploaded.url }));
         toast.success('Video uploaded successfully');
         setVideoFile(null);
+        setUploadProgress(0);
         return uploaded.url; // return the URL so callers can continue flow
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to upload video');
+      toast.error(error.message || 'Failed to upload video');
       console.error('Error uploading video:', error);
     } finally {
       setIsUploading(false);
+      setUploadProgress(0);
     }
     return null;
   };
@@ -301,13 +307,21 @@ const Videos = () => {
                         type="button"
                         onClick={handleUploadVideo}
                         disabled={isUploading}
-                        className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors disabled:bg-gray-400"
+                        className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors disabled:bg-gray-400 whitespace-nowrap"
                       >
                         <Upload className="w-4 h-4" />
-                        {isUploading ? 'Uploading...' : 'Upload'}
+                        {isUploading ? `Uploading... ${uploadProgress}%` : 'Upload'}
                       </button>
                     )}
                   </div>
+                  {isUploading && (
+                    <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                  )}
                   {videoFile && (
                     <p className="text-sm text-gray-600 mt-1">
                       Selected: {videoFile.name} ({(videoFile.size / (1024 * 1024)).toFixed(2)} MB)
