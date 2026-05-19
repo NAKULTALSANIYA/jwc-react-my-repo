@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Shirt, Gem, Truck, ShieldCheck, ArrowRight, MoveRight, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
 import VideoModal from '../components/VideoModal';
+import LazyImage from '../components/LazyImage';
 import { getVideos } from '../api/services/video.service';
 import { getHomeOccasions, getWomenCategories, getAccessoriesCategories } from '../api/services/occasion.service';
 
@@ -601,8 +602,8 @@ const Home = () => {
                                     >
                                         <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl w-[220px] sm:w-[260px] md:w-[300px] h-[280px] sm:h-[320px] md:h-[360px]">
                                             {/* Category Image */}
-                                            <img
-                                                src={category.image}
+                                            <LazyImage
+                                                src={buildMediaUrl(category.image)}
                                                 alt={category.name}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                             />
@@ -684,8 +685,8 @@ const Home = () => {
                                     >
                                         <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl w-[220px] sm:w-[260px] md:w-[300px] h-[280px] sm:h-[320px] md:h-[360px]">
                                             {/* Category Image */}
-                                            <img
-                                                src={category.image}
+                                            <LazyImage
+                                                src={buildMediaUrl(category.image)}
                                                 alt={category.name}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                             />
@@ -762,8 +763,8 @@ const Home = () => {
                                     >
                                         <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-lg transition-all duration-300 hover:shadow-2xl w-[220px] sm:w-[260px] md:w-[300px] h-[280px] sm:h-[320px] md:h-[360px]">
                                             {/* Category Image */}
-                                            <img
-                                                src={category.image}
+                                            <LazyImage
+                                                src={buildMediaUrl(category.image)}
                                                 alt={category.name}
                                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                             />
@@ -924,7 +925,7 @@ const Home = () => {
                         {/* Large Featured Card - Takes 2 columns on large screens */}
                         <div className="lg:col-span-2 lg:row-span-2 group cursor-pointer">
                             <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-2xl h-full min-h-[400px] lg:min-h-[600px]">
-                                <img
+                                <LazyImage
                                     src="/shop1.JPG"
                                     alt="Premium Collection"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -935,7 +936,7 @@ const Home = () => {
                         {/* Medium Card 1 */}
                         <div className="group cursor-pointer">
                             <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-xl h-full min-h-[250px] lg:min-h-[290px]">
-                                <img
+                                <LazyImage
                                     src="/shop2.JPG"
                                     alt="Ethnic Collection"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -946,7 +947,7 @@ const Home = () => {
                         {/* Medium Card 2 */}
                         <div className="group cursor-pointer">
                             <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-xl h-full min-h-[250px] lg:min-h-[290px]">
-                                <img
+                                <LazyImage
                                     src="/shop3.JPG"
                                     alt="Festive Collection"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -957,7 +958,7 @@ const Home = () => {
                         {/* Medium Card 3 */}
                         <div className="group cursor-pointer">
                             <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-xl h-full min-h-[250px] lg:min-h-[290px]">
-                                <img
+                                <LazyImage
                                     src="/shop4.JPG"
                                     alt="Designer Collection"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -968,7 +969,7 @@ const Home = () => {
                         {/* Medium Card 4 */}
                         <div className="group cursor-pointer">
                             <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-xl h-full min-h-[250px] lg:min-h-[290px]">
-                                <img
+                                <LazyImage
                                     src="/shop5.JPG"
                                     alt="Bridal Collection"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -979,7 +980,7 @@ const Home = () => {
                         {/* Small Cards Row */}
                         <div className="sm:col-span-2 lg:col-span-1 group cursor-pointer">
                             <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-xl h-full min-h-[200px]">
-                                <img
+                                <LazyImage
                                     src="/shop6.JPG"
                                     alt="Contemporary Collection"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -989,7 +990,7 @@ const Home = () => {
 
                         <div className="sm:col-span-2 lg:col-span-1 group cursor-pointer">
                             <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-xl h-full min-h-[200px]">
-                                <img
+                                <LazyImage
                                     src="/shop7.JPG"
                                     alt="Luxury Collection"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -999,7 +1000,7 @@ const Home = () => {
 
                         <div className="sm:col-span-2 lg:col-span-1 group cursor-pointer">
                             <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-xl h-full min-h-[200px]">
-                                <img
+                                <LazyImage
                                     src="/shop8.JPG"
                                     alt="Casual Collection"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -1009,7 +1010,7 @@ const Home = () => {
 
                         <div className="sm:col-span-2 lg:col-span-1 group cursor-pointer">
                             <div className="relative overflow-hidden rounded-xl md:rounded-2xl shadow-xl h-full min-h-[200px]">
-                                <img
+                                <LazyImage
                                     src="/shop9.JPG"
                                     alt="Accessories Collection"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"

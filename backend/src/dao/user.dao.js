@@ -216,6 +216,7 @@ class UserDAO {
     }
 
     const users = await User.find(query)
+      .populate('addresses')
       .sort(sort)
       .skip(skip)
       .limit(limit)

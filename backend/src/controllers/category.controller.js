@@ -1,11 +1,20 @@
 import CategoryService from '../services/category.service.js';
 import ApiResponse from '../utils/ApiResponse.js';
+import env from '../config/env.js';
 
 class CategoryController {
   // Admin routes - Category CRUD
   async createCategory(req, res, next) {
     try {
-      const category = await CategoryService.createCategory(req.body);
+      const categoryData = { ...req.body };
+
+      if (req.file) {
+        categoryData.image = `${env.BACKEND_URL}/uploads/${req.file.filename}`;
+      } else if (!categoryData.image && categoryData.imageUrl) {
+        categoryData.image = categoryData.imageUrl;
+      }
+
+      const category = await CategoryService.createCategory(categoryData);
       return ApiResponse.success(res, 'Category created successfully', { category });
     } catch (error) {
       next(error);
@@ -52,7 +61,15 @@ class CategoryController {
   async updateCategory(req, res, next) {
     try {
       const { id } = req.params;
-      const category = await CategoryService.updateCategory(id, req.body);
+      const updateData = { ...req.body };
+
+      if (req.file) {
+        updateData.image = `${env.BACKEND_URL}/uploads/${req.file.filename}`;
+      } else if (!updateData.image && updateData.imageUrl) {
+        updateData.image = updateData.imageUrl;
+      }
+
+      const category = await CategoryService.updateCategory(id, updateData);
       
       return ApiResponse.success(res, 'Category updated successfully', { category });
     } catch (error) {

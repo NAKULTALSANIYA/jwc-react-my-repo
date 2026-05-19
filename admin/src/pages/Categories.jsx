@@ -22,13 +22,14 @@ const Categories = () => {
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState(null);
     const [saving, setSaving] = useState(false);
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState('');
     const { success: showSuccess, error: showError } = useToast();
 
     const [formData, setFormData] = useState({
         name: '',
         description: '',
         image: '',
-        imageUrl: '',
         seoTitle: '',
         seoDescription: '',
         isActive: true,
@@ -56,11 +57,56 @@ const Categories = () => {
         loadCategories();
     }, []);
 
+    useEffect(() => {
+        if (!imageFile) {
+            setImagePreview('');
+            return undefined;
+        }
+
+        const previewUrl = URL.createObjectURL(imageFile);
+        setImagePreview(previewUrl);
+
+        return () => URL.revokeObjectURL(previewUrl);
+    }, [imageFile]);
+
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    const handleImageFileChange = (e) => {
+        const file = e.target.files?.[0];
+
+        if (!file) {
+            setImageFile(null);
+            return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+            showError('Please select a valid image file');
+            e.target.value = '';
+            setImageFile(null);
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            showError('Image must be 5MB or smaller');
+            e.target.value = '';
+            setImageFile(null);
+            return;
+        }
+
+        setImageFile(file);
+    };
+
+    const handleRemoveImage = () => {
+        setImageFile(null);
+        setFormData(prev => ({
+            ...prev,
+            image: ''
         }));
     };
 
@@ -79,11 +125,22 @@ const Categories = () => {
             delete categoryData.seoTitle;
             delete categoryData.seoDescription;
 
+            let payload = categoryData;
+
+            if (imageFile) {
+                payload = new FormData();
+                Object.entries(categoryData).forEach(([key, value]) => {
+                    if (value === undefined || value === null) return;
+                    payload.append(key, typeof value === 'boolean' || typeof value === 'number' ? String(value) : value);
+                });
+                payload.append('imageFile', imageFile);
+            }
+
             if (editingId) {
-                await adminApi.updateCategory(editingId, categoryData);
+                await adminApi.updateCategory(editingId, payload);
                 showSuccess('Category updated successfully');
             } else {
-                await adminApi.createCategory(categoryData);
+                await adminApi.createCategory(payload);
                 showSuccess('Category created successfully');
             }
             
@@ -102,8 +159,7 @@ const Categories = () => {
         setFormData({
             name: category.name || '',
             description: category.description || '',
-            image: category.image || '',
-            imageUrl: category.imageUrl || '',
+            image: category.image || category.imageUrl || '',
             seoTitle: category.metaTitle || '',
             seoDescription: category.metaDescription || '',
             isActive: category.isActive !== false,
@@ -111,6 +167,7 @@ const Categories = () => {
             displaySection: category.displaySection || 'none',
             sequence: category.sequence || 0
         });
+        setImageFile(null);
         setShowModal(true);
     };
 
@@ -135,7 +192,6 @@ const Categories = () => {
             name: '',
             description: '',
             image: '',
-            imageUrl: '',
             seoTitle: '',
             seoDescription: '',
             isActive: true,
@@ -143,6 +199,7 @@ const Categories = () => {
             displaySection: 'none',
             sequence: 0
         });
+        setImageFile(null);
         setEditingId(null);
     };
 
@@ -222,9 +279,9 @@ const Categories = () => {
                                     <tr key={category._id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors group">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                {category.image && (
+                                                {(category.image || category.imageUrl) && (
                                                     <img 
-                                                        src={category.image} 
+                                                        src={category.image || category.imageUrl} 
                                                         alt={category.name}
                                                         className="w-10 h-10 rounded object-cover"
                                                     />
@@ -321,15 +378,17 @@ const Categories = () => {
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
                         {/* Modal Header */}
-                        <div className="flex items-center justify-between p-6 border-b border-slate-200 sticky top-0 bg-white">
-                            <h2 className="text-xl font-bold text-slate-900">
+                        <div className="relative flex items-start justify-between gap-4 p-4 sm:p-6 border-b border-slate-200 sticky top-0 bg-white z-10">
+                            <h2 className="pr-12 text-xl font-bold text-slate-900">
                                 {editingId ? 'Edit Category' : 'Create New Category'}
                             </h2>
                             <button
                                 onClick={handleCloseModal}
-                                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                                className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 shadow-sm transition-colors hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:right-4 sm:top-4"
+                                aria-label="Close category modal"
+                                title="Close"
                             >
-                                <X size={24} />
+                                <X size={20} />
                             </button>
                         </div>
 
@@ -380,16 +439,42 @@ const Categories = () => {
 
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                                    Image URL (Alternative)
+                                    Upload Image File
                                 </label>
                                 <input
-                                    type="text"
-                                    name="imageUrl"
-                                    value={formData.imageUrl}
-                                    onChange={handleInputChange}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageFileChange}
                                     className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500"
-                                    placeholder="https://example.com/image.jpg"
                                 />
+                                {(imagePreview || formData.image) && (
+                                    <div className="mt-3 flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3 relative">
+                                        <button
+                                            type="button"
+                                            onClick={handleRemoveImage}
+                                            className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition-colors hover:bg-rose-50 hover:text-rose-600"
+                                            title="Remove image"
+                                            aria-label="Remove image"
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                        <div className="h-16 w-16 overflow-hidden rounded-md bg-white border border-slate-200 flex items-center justify-center">
+                                            <img
+                                                src={imagePreview || formData.image}
+                                                alt="Category preview"
+                                                className="h-full w-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-medium text-slate-900 truncate">
+                                                {imageFile ? imageFile.name : 'Current category image'}
+                                            </p>
+                                            <p className="text-xs text-slate-500 truncate">
+                                                {imageFile ? 'Will upload when you save the category' : formData.image}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

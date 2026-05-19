@@ -166,7 +166,7 @@ const Customers = () => {
                                     </div>
                                     <div className="flex items-center gap-3 text-sm text-slate-600">
                                         <Phone size={16} className="text-slate-400" />
-                                        {customer.phone || customer.mobile || 'No phone'}
+                                        {customer.addresses?.[0]?.phone || customer.phone || customer.mobile || 'No phone'}
                                     </div>
                                     <div className="flex items-center gap-3 text-sm text-slate-600">
                                         <MapPin size={16} className="text-slate-400" />

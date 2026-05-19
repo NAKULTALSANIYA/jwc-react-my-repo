@@ -15,7 +15,7 @@ const toastContainer = {
   
   notify(message, type = 'success', duration = 3000) {
     const id = Math.random();
-    this.notifications.push({ id, message, type, duration });
+    this.notifications = [...this.notifications, { id, message, type, duration }];
     this.listeners.forEach(listener => listener(this.notifications));
     
     if (duration > 0) {
@@ -93,11 +93,12 @@ export const ToastProvider = ({ children }) => {
             <ToastItem
               notification={notification}
               onRemove={() => {
-                toastContainer.notifications = toastContainer.notifications.filter(
+                const newNotifications = toastContainer.notifications.filter(
                   n => n.id !== notification.id
                 );
+                toastContainer.notifications = newNotifications;
                 toastContainer.listeners.forEach(listener => 
-                  listener(toastContainer.notifications)
+                  listener(newNotifications)
                 );
               }}
             />
