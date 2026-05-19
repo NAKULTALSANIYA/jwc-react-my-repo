@@ -1,4 +1,4 @@
-import { apiClient } from './client';
+import { apiClient, buildUrl } from './client';
 
 const toQuery = (params = {}) => {
   const search = new URLSearchParams();
@@ -119,7 +119,7 @@ export const adminApi = {
       });
 
       const token = localStorage.getItem('token');
-      xhr.open('POST', '/api/videos/upload');
+      xhr.open('POST', buildUrl('/api/videos/upload'));
       if (token) {
         xhr.setRequestHeader('Authorization', `Bearer ${token}`);
       }

@@ -78,4 +78,4 @@ export const apiClient = {
   del: (path, options = {}) => request(path, { ...options, method: 'DELETE' }),
 };
 
-export { API_BASE_URL, request as rawRequest };
+export { API_BASE_URL, buildUrl, request as rawRequest };
