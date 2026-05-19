@@ -494,7 +494,7 @@ const Categories = () => {
                                     <p className="text-xs text-slate-500 mt-1">Lower numbers appear first on home page</p>
                                 </div>
 
-                                <div className="flex flex-col justify-end gap-2">
+                                {/* <div className="flex flex-col justify-end gap-2">
                                     <label className="flex items-center gap-3">
                                         <input
                                             type="checkbox"
@@ -506,7 +506,7 @@ const Categories = () => {
                                         <span className="text-sm font-medium text-slate-700">Display on Home Page</span>
                                     </label>
                                     <p className="text-xs text-slate-500">Show this occasion in the "Shop by Occasion" section</p>
-                                </div>
+                                </div> */}
 
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-2">
